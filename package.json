@@ -1,0 +1,20 @@
+{
+  "name": "jadenode-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "JadeNode cloud infrastructure marketplace monorepo.",
+  "scripts": {
+    "dev": "echo \"Run app-specific dev commands after STORY-FND-003 and STORY-FND-004 are implemented.\"",
+    "test": "echo \"Test scripts will be wired after backend/frontend scaffolding.\"",
+    "typecheck": "echo \"Frontend typecheck will be wired after Next.js scaffolding.\"",
+    "lint": "echo \"Lint scripts will be wired after app scaffolding.\"",
+    "build": "echo \"Build scripts will be wired after app scaffolding.\""
+  },
+  "workspaces": [
+    "frontend",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}

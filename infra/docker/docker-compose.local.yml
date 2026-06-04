@@ -1,0 +1,88 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: jadenode-postgres
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-jadenode}
+      POSTGRES_USER: ${POSTGRES_USER:-jadenode}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-jadenode} -d ${POSTGRES_DB:-jadenode}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: redis:7
+    container_name: jadenode-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: jadenode-mailpit
+    restart: unless-stopped
+    ports:
+      - "${MAILPIT_SMTP_PORT:-1025}:1025"
+      - "${MAILPIT_WEB_PORT:-8025}:8025"
+    environment:
+      MP_MAX_MESSAGES: 5000
+
+  minio:
+    image: minio/minio:latest
+    container_name: jadenode-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-jadenode}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-jadenodesecret}
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: jadenode-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    restart: "no"
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:${MINIO_API_PORT:-9000} ${MINIO_ROOT_USER:-jadenode} ${MINIO_ROOT_PASSWORD:-jadenodesecret} &&
+      if ! mc ls local/${MINIO_BUCKET:-jadenode} > /dev/null 2>&1; then
+        mc mb local/${MINIO_BUCKET:-jadenode} &&
+        echo 'Bucket ${MINIO_BUCKET:-jadenode} created.';
+      else
+        echo 'Bucket ${MINIO_BUCKET:-jadenode} already exists.';
+      fi
+      "
+
+volumes:
+  postgres_data:
+    driver: local
+  minio_data:
+    driver: local

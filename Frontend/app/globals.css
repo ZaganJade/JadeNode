@@ -1,0 +1,835 @@
+@import "tailwindcss";
+
+@theme {
+  /* ───── Quiet Dark Ops palette ──────────────────────────────────────── */
+  --color-bg: #06080c;
+  --color-surface: #0c0f15;
+  --color-surface-2: #11151c;
+  --color-surface-3: #171c25;
+  --color-surface-4: #1e2530;
+
+  --color-fg: #f5f3ee;
+  --color-fg-muted: #9ea0a6;
+  --color-fg-dim: #61656d;
+
+  --color-line: #1f2630;
+  --color-line-strong: #2a3340;
+
+  /* Signature lime — the only "branded" color */
+  --color-accent: #c6f24a;
+  --color-accent-fg: #0a0d05;
+  --color-accent-soft: #1d2a0c;
+
+  /* Supporting */
+  --color-steel: #7a96b1;
+  --color-steel-soft: #1a2530;
+  --color-magenta: #f6549e;
+  --color-magenta-soft: #2a1422;
+  --color-amber: #f5b347;
+  --color-amber-soft: #2a1f0c;
+  --color-success: #6ce8a6;
+  --color-success-soft: #0a2a1c;
+  --color-error: #ff7a7a;
+
+  /* Material-style aliases (for downstream pages still using them) */
+  --color-primary: var(--color-accent);
+  --color-on-primary: var(--color-accent-fg);
+  --color-primary-container: var(--color-accent);
+  --color-on-primary-container: var(--color-accent-fg);
+  --color-secondary: var(--color-magenta);
+  --color-on-secondary: #2a1422;
+  --color-secondary-container: var(--color-magenta);
+  --color-on-secondary-container: #ffe0ee;
+  --color-tertiary: var(--color-steel);
+  --color-on-tertiary: #0e1a26;
+  --color-tertiary-container: var(--color-steel);
+  --color-on-tertiary-container: #e6eef6;
+  --color-on-surface: var(--color-fg);
+  --color-on-surface-variant: var(--color-fg-muted);
+  --color-outline: var(--color-line-strong);
+  --color-outline-variant: var(--color-line);
+  --color-background: var(--color-bg);
+  --color-on-background: var(--color-fg);
+  --color-surface-container: var(--color-surface-2);
+  --color-surface-container-low: var(--color-surface);
+  --color-surface-container-lowest: var(--color-bg);
+  --color-surface-container-high: var(--color-surface-3);
+  --color-surface-container-highest: var(--color-surface-4);
+
+  /* ───── Spacing ─────────────────────────────────────────────────────── */
+  --spacing-base: 8px;
+  --spacing-gutter: 24px;
+
+  --container-container-max: 1280px;
+
+  /* ───── Radii ───────────────────────────────────────────────────────── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
+
+  /* ───── Fonts ───────────────────────────────────────────────────────── */
+  --font-sans: var(--font-geist), Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-geist), Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), "Instrument Serif", ui-serif,
+    Georgia, serif;
+  --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace,
+    monospace;
+}
+
+/* ───── Brand Motion Identity ─────────────────────────────────────────── */
+:root {
+  /* Premium-leaning Corporate. One signature curve drives 80% of motion. */
+  --ease-signature: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-emphasis: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-ambient: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --dur-quick: 180ms;
+  --dur-standard: 360ms;
+  --dur-slow: 640ms;
+
+  --background: var(--color-bg);
+  --foreground: var(--color-fg);
+  --border: var(--color-line);
+  --ring: var(--color-accent);
+  --radius: 8px;
+}
+
+* { border-color: var(--color-line); }
+
+/* ───── Utility text colors ────────────────────────────────────────────── */
+.text-success { color: var(--color-success); }
+.text-accent { color: var(--color-accent); }
+.text-fg-dim { color: var(--color-fg-dim); }
+.text-fg-muted { color: var(--color-fg-muted); }
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11", "calt";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Make the editorial italic feel deliberate */
+.serif-italic {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24;
+}
+
+/* ───── Hairline borders ─────────────────────────────────────────────── */
+.hairline-x {
+  background-image: linear-gradient(90deg, transparent, var(--color-line-strong), transparent);
+}
+.hairline-y {
+  background-image: linear-gradient(180deg, transparent, var(--color-line-strong), transparent);
+}
+
+/* ───── Glass panel (used sparingly) ─────────────────────────────────── */
+.glass {
+  background: rgba(12, 15, 21, 0.55);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+}
+
+/* ───── Reveal on scroll ─────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+  transition:
+    opacity var(--dur-slow) var(--ease-signature),
+    transform var(--dur-slow) var(--ease-signature);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Word-by-word stagger for hero headline */
+.word {
+  display: inline-block;
+  opacity: 0;
+  transform: translate3d(0, 0.4em, 0);
+  transition:
+    opacity 640ms var(--ease-signature),
+    transform 640ms var(--ease-signature);
+}
+.word.is-visible { opacity: 1; transform: none; }
+
+/* ───── Subtle grid backdrop ──────────────────────────────────────────── */
+.grid-bg {
+  background-image:
+    linear-gradient(var(--color-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 60% 50% at 50% 30%, black, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 30%, black, transparent 70%);
+}
+
+/* ───── Marquee (CSS-only, two-track) ────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+.marquee-track {
+  display: inline-flex;
+  gap: 48px;
+  animation: marquee 50s linear infinite;
+  will-change: transform;
+}
+.marquee-track[data-speed="fast"]  { animation-duration: 30s; }
+.marquee-track[data-speed="slow"]  { animation-duration: 80s; }
+.marquee:hover .marquee-track      { animation-play-state: paused; }
+
+/* ───── Product Scroll Ticker ──────────────────────────────────────────── */
+@keyframes scroll-ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-scroll-ticker {
+  animation: scroll-ticker 90s linear infinite;
+  will-change: transform;
+  display: flex;
+  gap: 2rem;
+}
+.animate-scroll-ticker:hover {
+  animation-play-state: paused;
+}
+
+/* ───── Pulse dot ────────────────────────────────────────────────────── */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.85; transform: scale(1);    }
+  50%      { opacity: 0.40; transform: scale(0.85); }
+}
+.pulse-dot { animation: pulse-dot 2.4s var(--ease-ambient) infinite; }
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.6); opacity: 0.6; }
+  100% { transform: scale(2.2); opacity: 0;   }
+}
+.pulse-ring::after {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: 9999px;
+  border: 1px solid currentColor;
+  animation: pulse-ring 3s var(--ease-ambient) infinite;
+}
+
+/* ───── Wire flows for SVG network ───────────────────────────────────── */
+.wire-stroke { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+@keyframes wire-flow         { to { stroke-dashoffset: -1000; } }
+@keyframes wire-flow-reverse { to { stroke-dashoffset:  1000; } }
+.wire-flow         { stroke-dasharray: 3 11; animation: wire-flow 18s linear infinite; }
+.wire-flow-fast    { stroke-dasharray: 2  9; animation: wire-flow 9s  linear infinite; }
+.wire-flow-reverse { stroke-dasharray: 4 14; animation: wire-flow-reverse 22s linear infinite; }
+
+@keyframes wire-pulse-stroke {
+  0%, 100% { stroke-opacity: 0.18; }
+  50%      { stroke-opacity: 0.55; }
+}
+.wire-pulse { animation: wire-pulse-stroke 5s var(--ease-ambient) infinite; }
+
+/* ───── Travelling data packet ───────────────────────────────────────── */
+@keyframes packet-travel {
+  0%   { offset-distance: 0%;   opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+.packet {
+  width: 6px; height: 6px;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  box-shadow:
+    0 0 10px 2px rgba(198, 242, 74, 0.6),
+    0 0 20px 4px rgba(198, 242, 74, 0.25);
+  offset-rotate: 0deg;
+  animation: packet-travel 5.5s var(--ease-emphasis) infinite;
+}
+
+/* ───── Globe rotation ───────────────────────────────────────────────── */
+@keyframes globe-rotate { to { transform: rotate(360deg); } }
+.globe-rotate-slow { animation: globe-rotate 60s linear infinite; transform-origin: center; }
+.globe-rotate-fast { animation: globe-rotate 22s linear infinite; transform-origin: center; }
+
+/* ───── Cursor follower ──────────────────────────────────────────────── */
+.cursor-dot {
+  position: fixed;
+  top: 0; left: 0;
+  width: 28px; height: 28px;
+  border-radius: 9999px;
+  border: 1px solid rgba(245, 243, 238, 0.4);
+  pointer-events: none;
+  z-index: 100;
+  transform: translate3d(-100px, -100px, 0);
+  transition:
+    transform 60ms linear,
+    width    240ms var(--ease-signature),
+    height   240ms var(--ease-signature),
+    background var(--dur-quick) var(--ease-signature),
+    border-color var(--dur-quick) var(--ease-signature);
+  mix-blend-mode: difference;
+}
+.cursor-dot[data-state="grow"] {
+  width: 56px; height: 56px;
+  background: rgba(198, 242, 74, 0.25);
+  border-color: var(--color-accent);
+}
+@media (pointer: coarse) { .cursor-dot { display: none; } }
+
+/* ───── Scroll progress bar ──────────────────────────────────────────── */
+.scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 100%;
+  transform-origin: 0 50%;
+  transform: scaleX(var(--scroll, 0));
+  background: linear-gradient(90deg, var(--color-accent), var(--color-magenta));
+  z-index: 60;
+  pointer-events: none;
+}
+
+/* ───── Interactive card spotlight ───────────────────────────────────── */
+.spotlight-card {
+  position: relative;
+  overflow: hidden;
+  transition:
+    border-color var(--dur-standard) var(--ease-signature),
+    transform var(--dur-quick) var(--ease-signature);
+}
+.spotlight-card::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(
+    420px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(198, 242, 74, 0.10),
+    rgba(122, 150, 177, 0.05) 40%,
+    transparent 70%
+  );
+  opacity: var(--spot-opacity, 0);
+  transition: opacity var(--dur-standard) var(--ease-signature);
+  pointer-events: none;
+  border-radius: inherit;
+}
+.spotlight-card:hover { transform: translate3d(0, -2px, 0); }
+
+/* ───── Caret blink ──────────────────────────────────────────────────── */
+@keyframes caret-blink { 50% { opacity: 0; } }
+.caret { display: inline-block; animation: caret-blink 1s steps(1) infinite; }
+
+/* ───── Number tween (works with CSS @property fallback) ─────────────── */
+@property --num {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 0;
+}
+
+/* ───── Scanline (subtle) ────────────────────────────────────────────── */
+@keyframes scan {
+  0%   { transform: translate3d(0, -100%, 0); opacity: 0; }
+  10%  { opacity: 0.55; }
+  90%  { opacity: 0.55; }
+  100% { transform: translate3d(0, 800%, 0); opacity: 0; }
+}
+.scanline {
+  position: absolute; inset-inline: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(198, 242, 74, 0.45), transparent);
+  animation: scan 12s linear infinite;
+  pointer-events: none;
+}
+
+/* ───── Ambient glows (animated) ─────────────────────────────────────── */
+.ambient-glow {
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 9999px;
+  filter: blur(120px);
+  opacity: 0.15;
+  z-index: -1;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: ambient-pulse 8s var(--ease-ambient) infinite;
+}
+.glow-lime    { background: radial-gradient(circle, #c6f24a 0%, transparent 70%); }
+.glow-steel   { background: radial-gradient(circle, #3a6890 0%, transparent 70%); }
+.glow-magenta { background: radial-gradient(circle, #b53a6b 0%, transparent 70%); }
+
+@keyframes ambient-pulse {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50% { opacity: 0.22; transform: scale(1.05); }
+}
+
+/* ───── Reduced motion ───────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal, .word, .marquee-track, .pulse-dot, .pulse-ring::after,
+  .wire-flow, .wire-flow-fast, .wire-flow-reverse, .wire-pulse, .packet,
+  .globe-rotate-slow, .globe-rotate-fast, .scanline, .cursor-dot,
+  .ambient-glow, .animate-fade-in-right, .animate-pulse-slow,
+  .animate-gradient-shift, .typing-line, .typing-line-delayed,
+  .data-stream, .animate-spin-slow, .animate-scan-vertical {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ───── Developer Section Animations ─────────────────────────────────── */
+@keyframes scan-vertical {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+.animate-scan-vertical {
+  animation: scan-vertical 8s linear infinite;
+}
+
+/* ───── Data stream particles ─────────────────────────────────────────── */
+@keyframes stream-flow {
+  0% {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(600px);
+    opacity: 0;
+  }
+}
+
+.data-stream {
+  width: 2px;
+  height: 40px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--color-accent),
+    transparent
+  );
+  animation: stream-flow var(--duration, 4s) ease-in-out infinite;
+}
+
+/* ───── Typing animation for code ─────────────────────────────────────── */
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.typing-container {
+  opacity: 0;
+  animation: fadeIn 0.8s var(--ease-signature) forwards;
+}
+
+.typing-line {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  animation: typing 2s steps(40, end) forwards;
+  border-right: 2px solid var(--color-accent);
+}
+
+.typing-line-delayed {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  opacity: 0;
+  animation:
+    typing 1.5s steps(30, end) forwards,
+    fadeIn 0.3s ease-in forwards;
+}
+
+/* ───── Caret blink ───────────────────────────────────────────────────── */
+@keyframes caret-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.caret {
+  display: inline-block;
+  animation: caret-blink 1s steps(1) infinite;
+  color: var(--color-accent);
+  margin-left: 2px;
+}
+
+/* ───── Fade in for delayed elements ─────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ───── Scrollbar ────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-line-strong);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-fg-dim); }
+
+::selection { background: rgba(198, 242, 74, 0.30); color: #f5f3ee; }
+
+/* ───── Additional animations for landing page ─────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(10px, -15px, 0); }
+  50% { transform: translate3d(-5px, -25px, 0); }
+  75% { transform: translate3d(-15px, -10px, 0); }
+}
+
+@keyframes fade-in-right {
+  from {
+    opacity: 0;
+    transform: translate3d(20px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes gradient-shift {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in-right {
+  animation: fade-in-right 0.8s var(--ease-signature) both;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s var(--ease-ambient) infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 1s var(--ease-signature) both;
+}
+
+.animate-gradient-shift {
+  animation: gradient-shift 4s var(--ease-ambient) infinite;
+}
+
+/* ───── Spotlight effect on cards ──────────────────────────────────────── */
+.spotlight-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.spotlight-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(198, 242, 74, 0.08),
+    transparent 50%
+  );
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.spotlight-card:hover::before {
+  opacity: 1;
+}
+
+/* ───── Counter animation (JavaScript triggered) ───────────────────────── */
+.counter.is-counting {
+  transition: all 1s var(--ease-signature);
+}
+
+/* ───── Grid pattern for marketplace hero ─────────────────────────────────── */
+.bg-grid-pattern {
+  background-image:
+    linear-gradient(var(--color-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   STUDIO THEME — scoped "orange-on-black" clone of the reference landing.
+   Everything below only applies inside `.studio`. Redefining the design-token
+   custom properties re-tints every Tailwind utility (bg-accent, text-fg-muted,
+   border-line, font-display, …) for descendants without touching the rest of
+   the app, which keeps its lime identity.
+   ══════════════════════════════════════════════════════════════════════════ */
+.studio {
+  /* Void black + warm-graphite surfaces */
+  --color-bg: #000000;
+  --color-surface: #0a0a0b;
+  --color-surface-2: #101012;
+  --color-surface-3: #17171a;
+  --color-surface-4: #1f1f23;
+
+  --color-fg: #f7f7f4;
+  --color-fg-muted: #8c8c92;
+  --color-fg-dim: #56565d;
+
+  --color-line: rgba(255, 255, 255, 0.07);
+  --color-line-strong: rgba(255, 255, 255, 0.14);
+
+  /* Signature orange — sampled from the reference (#ff7400) */
+  --color-accent: #ff7400;
+  --color-accent-fg: #ffffff;
+  --color-accent-soft: rgba(255, 116, 0, 0.1);
+  --accent-rgb: 255, 116, 0;
+
+  /* Satoshi drives every display headline */
+  --font-display: "Satoshi", var(--font-geist), ui-sans-serif, system-ui,
+    sans-serif;
+
+  background: #000000;
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  letter-spacing: -0.01em;
+}
+
+.studio ::selection {
+  background: rgba(var(--accent-rgb), 0.35);
+  color: #fff;
+}
+
+/* Display headlines — Satoshi, tight, slightly negative tracking */
+.studio-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 0.94;
+}
+.studio-hero-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.92;
+}
+
+/* Mono eyebrow label — the reference's small orange/grey captions */
+.studio-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+}
+
+/* ───── Right-edge scroll rail (orange thumb on a faint track) ──────────── */
+.studio-rail {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 3px;
+  height: 100vh;
+  z-index: 60;
+  background: rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+.studio-rail__thumb {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+  height: var(--rail, 0%);
+  background: linear-gradient(180deg, #ffae5c, var(--color-accent));
+  box-shadow: 0 0 12px 1px rgba(var(--accent-rgb), 0.65);
+  transition: height 90ms linear;
+}
+
+/* ───── Hero atmosphere behind the network paths ───────────────────────── */
+.studio-streaks-fallback {
+  background:
+    radial-gradient(
+      42% 55% at 66% 46%,
+      rgba(var(--accent-rgb), 0.2),
+      transparent 70%
+    ),
+    radial-gradient(
+      60% 70% at 50% 0%,
+      rgba(var(--accent-rgb), 0.1),
+      transparent 65%
+    );
+}
+
+/* ───── Bento node-cluster ──────────────────────────────────────────────
+   A signal climbs the diagonal staircase node-by-node (capacity coming
+   online), then idle fleet nodes occasionally flicker to life. Real scale +
+   glow travel so the motion is clearly legible, not just a static breathe. */
+@keyframes node-travel {
+  0%, 70%, 100% {
+    border-color: rgba(var(--accent-rgb), 0.3);
+    background: rgba(var(--accent-rgb), 0.05);
+    box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0);
+    transform: scale(1);
+  }
+  12% {
+    border-color: rgba(var(--accent-rgb), 1);
+    background: rgba(var(--accent-rgb), 0.38);
+    box-shadow: 0 0 22px 3px rgba(var(--accent-rgb), 0.6);
+    transform: scale(1.22);
+  }
+  32% {
+    border-color: rgba(var(--accent-rgb), 0.45);
+    background: rgba(var(--accent-rgb), 0.1);
+    box-shadow: 0 0 6px 0 rgba(var(--accent-rgb), 0.15);
+    transform: scale(1);
+  }
+}
+.node-travel {
+  animation: node-travel 3s var(--ease-emphasis) infinite both;
+}
+
+@keyframes node-flicker {
+  0%, 44%, 60%, 100% {
+    border-color: var(--color-line-strong);
+    background: rgba(255, 255, 255, 0.015);
+    box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0);
+  }
+  50% {
+    border-color: rgba(var(--accent-rgb), 0.85);
+    background: rgba(var(--accent-rgb), 0.2);
+    box-shadow: 0 0 12px 0 rgba(var(--accent-rgb), 0.35);
+  }
+}
+.node-flicker {
+  animation: node-flicker 5.5s var(--ease-ambient) infinite both;
+}
+
+/* ───── Loading bars (the reference's animated progress slivers) ────────── */
+@keyframes bar-fill {
+  0% { transform: scaleX(0.05); }
+  60% { transform: scaleX(1); }
+  100% { transform: scaleX(1); }
+}
+.studio-bar > span {
+  display: block;
+  height: 100%;
+  transform-origin: 0 50%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--color-accent), #ffb066);
+  animation: bar-fill 2.4s var(--ease-emphasis) infinite alternate;
+}
+
+/* ───── Tab pills ───────────────────────────────────────────────────────── */
+.studio-tab {
+  transition:
+    background var(--dur-quick) var(--ease-signature),
+    color var(--dur-quick) var(--ease-signature);
+}
+
+/* ───── Globe arcs (orange great-circle flows) ─────────────────────────── */
+@keyframes arc-draw {
+  0% { stroke-dashoffset: 360; opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0.15; }
+}
+.studio-arc {
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 360;
+  animation: arc-draw 6s var(--ease-emphasis) infinite;
+}
+@keyframes globe-spin { to { transform: rotate(360deg); } }
+.studio-meridians {
+  transform-origin: center;
+  animation: globe-spin 80s linear infinite;
+}
+
+/* ───── Card lift + hairline-to-orange border on hover ─────────────────── */
+.studio-card {
+  position: relative;
+  transition:
+    border-color var(--dur-standard) var(--ease-signature),
+    transform var(--dur-quick) var(--ease-signature),
+    background var(--dur-standard) var(--ease-signature);
+}
+.studio-card:hover {
+  transform: translate3d(0, -3px, 0);
+  border-color: rgba(var(--accent-rgb), 0.45);
+}
+
+/* ───── Marquee logo strip ──────────────────────────────────────────────── */
+@keyframes studio-marquee { to { transform: translate3d(-50%, 0, 0); } }
+.studio-marquee-track {
+  display: inline-flex;
+  gap: 64px;
+  white-space: nowrap;
+  animation: studio-marquee 38s linear infinite;
+  will-change: transform;
+}
+.studio-marquee:hover .studio-marquee-track { animation-play-state: paused; }
+
+/* ───── Word-rise reveal for big headlines ─────────────────────────────── */
+.studio .reveal-rise {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 720ms var(--ease-signature),
+    transform 720ms var(--ease-signature);
+}
+.studio .reveal-rise.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .node-travel,
+  .node-flicker,
+  .studio-bar > span,
+  .studio-arc,
+  .studio-meridians,
+  .studio-marquee-track {
+    animation: none !important;
+  }
+  .studio .reveal-rise {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

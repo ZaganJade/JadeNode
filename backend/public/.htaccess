@@ -1,0 +1,11 @@
+{
+    "ify": true,
+    "ignore": [
+        "node_modules",
+        "vendor"
+    ],
+    "rules": {
+        "/": "index.html",
+        "/api": "index.html"
+    }
+}
