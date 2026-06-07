@@ -191,8 +191,8 @@ export default function DeploymentDetailPage() {
 
       try {
         await api.post(
-          `/api/v1/deployments/${deployment.public_id}/actions`,
-          { action },
+          `/api/v1/deployments/${deployment.public_id}/action`,
+          { action_type: action },
         );
         // Refresh deployment data
         const data = await api.get<DeploymentDetail>(
@@ -219,8 +219,7 @@ export default function DeploymentDetailPage() {
 
     try {
       await api.post(
-        `/api/v1/deployments/${deployment.public_id}/cancel`,
-        { cancel_at_period_end: true },
+        `/api/v1/deployments/${deployment.public_id}/cancel-at-period-end`,
       );
       const data = await api.get<DeploymentDetail>(
         `/api/v1/deployments/${deployment.public_id}`,

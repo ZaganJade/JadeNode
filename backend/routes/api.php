@@ -5,8 +5,11 @@ use App\Http\Middleware\EnsureBetaAccess;
 use App\Http\Middleware\EnsureEmailIsVerified;
 use App\Http\Middleware\EnsureIsAdmin;
 use App\Modules\Admin\Controllers\AdminBetaAccessController;
+use App\Modules\Admin\Controllers\AdminDashboardController;
 use App\Modules\Admin\Controllers\AdminListingController;
+use App\Modules\Admin\Controllers\AdminProviderController;
 use App\Modules\Admin\Controllers\AdminTicketController;
+use App\Modules\Admin\Controllers\AdminUserController;
 use App\Modules\Auth\Controllers\AuthenticatedUserController;
 use App\Modules\Auth\Controllers\BetaAccessController;
 use App\Modules\Auth\Controllers\EmailVerificationController;
@@ -19,11 +22,15 @@ use App\Modules\Deployment\Controllers\DeploymentController;
 use App\Modules\Deployment\Controllers\ProvisioningController;
 use App\Modules\Deployment\Controllers\ResourceActionController;
 use App\Modules\Deployment\Controllers\SshKeyController;
+use App\Modules\Order\Controllers\InvoiceController;
 use App\Modules\Order\Controllers\AdminPaymentListController;
 use App\Modules\Order\Controllers\AdminPaymentSyncController;
+use App\Modules\Order\Controllers\CartCheckoutController;
 use App\Modules\Order\Controllers\CheckoutController;
 use App\Modules\Order\Controllers\MidtransWebhookController;
 use App\Modules\Order\Controllers\PaymentController;
+use App\Modules\Article\Controllers\ArticleController;
+use App\Modules\Article\Controllers\AdminArticleController;
 use App\Modules\Audit\Controllers\AdminAuditController;
 use App\Modules\Support\Controllers\TicketController;
 use Illuminate\Support\Facades\Route;
@@ -82,10 +89,15 @@ Route::prefix('v1/orders')->middleware(['auth:sanctum', EnsureEmailIsVerified::c
     Route::post('/{orderId}/pay', [PaymentController::class, 'create']);
 });
 
+// Cart checkout — Authenticated + Verified + Beta Access (multi-item)
+Route::prefix('v1/cart')->middleware(['auth:sanctum', EnsureEmailIsVerified::class, EnsureBetaAccess::class])->group(function () {
+    Route::post('/checkout', [CartCheckoutController::class, 'store']);
+});
+
 // Orders — Authenticated (view own orders)
 Route::prefix('v1/orders')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [CheckoutController::class, 'index']);
-    Route::get('/{id}', [CheckoutController::class, 'show']);
+    Route::get('/{public_id}', [CheckoutController::class, 'show']);
 });
 
 // Payments — Authenticated
@@ -108,19 +120,26 @@ Route::prefix('v1/tickets')->middleware('auth:sanctum')->group(function () {
 
 // Admin — Authenticated + Admin only
 Route::prefix('v1/admin')->middleware(['auth:sanctum', EnsureIsAdmin::class])->group(function () {
+    Route::get('/stats', [AdminDashboardController::class, 'stats']);
+
     Route::get('/beta-access', [AdminBetaAccessController::class, 'index']);
     Route::put('/beta-access/{id}', [AdminBetaAccessController::class, 'review']);
 
     Route::get('/listings', [AdminListingController::class, 'index']);
+    Route::get('/listings/form-options', [AdminListingController::class, 'formOptions']);
+    Route::post('/listings', [AdminListingController::class, 'store']);
     Route::put('/listings/{id}', [AdminListingController::class, 'update']);
+    Route::delete('/listings/{id}', [AdminListingController::class, 'destroy']);
+
+    Route::get('/providers', [AdminProviderController::class, 'index']);
 
     Route::get('/payments', [AdminPaymentListController::class, 'index']);
     Route::post('/payments/{paymentId}/sync', [AdminPaymentSyncController::class, 'sync']);
 
     Route::get('/tickets', [AdminTicketController::class, 'index']);
-    Route::get('/tickets/{id}', [AdminTicketController::class, 'show']);
-    Route::post('/tickets/{id}/reply', [AdminTicketController::class, 'reply']);
-    Route::put('/tickets/{id}/status', [AdminTicketController::class, 'updateStatus']);
+    Route::get('/tickets/{public_id}', [AdminTicketController::class, 'show']);
+    Route::post('/tickets/{public_id}/reply', [AdminTicketController::class, 'reply']);
+    Route::put('/tickets/{public_id}/status', [AdminTicketController::class, 'updateStatus']);
 
     // Provisioning — Admin
     Route::get('/provisioning-tasks', [ProvisioningController::class, 'index']);
@@ -128,20 +147,50 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', EnsureIsAdmin::class])->g
     Route::post('/provisioning-tasks/{taskId}/complete', [ProvisioningController::class, 'complete']);
     Route::post('/provisioning-tasks/{taskId}/fail', [ProvisioningController::class, 'fail']);
 
-    // Resource Actions — Admin processing
+    // Resource Actions — Admin
+    Route::get('/resource-actions', [ResourceActionController::class, 'adminIndex']);
     Route::post('/resource-actions/{actionId}/process', [ResourceActionController::class, 'process']);
+
+    // Users — Admin
+    Route::get('/users', [AdminUserController::class, 'index']);
 
     // Audit Logs — Admin
     Route::get('/audit-logs', [AdminAuditController::class, 'index']);
     Route::get('/audit-logs/{id}', [AdminAuditController::class, 'show']);
+
+    // Articles — Admin
+    Route::get('/articles', [AdminArticleController::class, 'index']);
+    Route::post('/articles', [AdminArticleController::class, 'store']);
+    Route::get('/articles/archive', [AdminArticleController::class, 'archived']);
+    Route::get('/articles/{id}', [AdminArticleController::class, 'show']);
+    Route::put('/articles/{id}', [AdminArticleController::class, 'update']);
+    Route::delete('/articles/{id}', [AdminArticleController::class, 'destroy']);
+    Route::put('/articles/{id}/archive', [AdminArticleController::class, 'archive']);
+    Route::put('/articles/{id}/unarchive', [AdminArticleController::class, 'unarchive']);
 });
 
 // Deployments — Authenticated (customer)
 Route::prefix('v1/deployments')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [DeploymentController::class, 'index']);
-    Route::get('/{id}', [DeploymentController::class, 'show']);
-    Route::post('/{id}/action', [DeploymentController::class, 'requestAction']);
-    Route::post('/{id}/cancel-at-period-end', [DeploymentController::class, 'cancelAtPeriodEnd']);
+    Route::get('/{public_id}', [DeploymentController::class, 'show']);
+    Route::post('/{public_id}/action', [DeploymentController::class, 'requestAction']);
+    Route::post('/{public_id}/cancel-at-period-end', [DeploymentController::class, 'cancelAtPeriodEnd']);
+    Route::get('/{public_id}/credential', [DeploymentController::class, 'credential']);
+    Route::get('/{public_id}/ssh-keys', [DeploymentController::class, 'sshKeys']);
+});
+
+// Articles — Public
+Route::prefix('v1/articles')->group(function () {
+    Route::get('/', [ArticleController::class, 'index']);
+    Route::get('/categories', [ArticleController::class, 'categories']);
+    Route::get('/{slug}', [ArticleController::class, 'show']);
+});
+
+// Invoices — Authenticated
+Route::prefix('v1/invoices')->middleware('auth:sanctum')->group(function () {
+    Route::get('/', [InvoiceController::class, 'index']);
+    Route::get('/{public_id}', [InvoiceController::class, 'show']);
+    Route::post('/{public_id}/pay', [InvoiceController::class, 'pay']);
 });
 
 // SSH Keys — Authenticated
@@ -152,6 +201,6 @@ Route::prefix('v1/ssh-keys')->middleware('auth:sanctum')->group(function () {
 });
 
 // Resource Actions (per deployment) — Authenticated
-Route::prefix('v1/deployments/{deploymentId}/actions')->middleware('auth:sanctum')->group(function () {
+Route::prefix('v1/deployments/{public_id}/actions')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [ResourceActionController::class, 'index']);
 });

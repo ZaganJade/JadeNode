@@ -35,6 +35,7 @@ class ResourceProductResource extends JsonResource
             'currency' => $defaultPrice ? $defaultPrice->currency : 'IDR',
             'availability' => $this->availability_status,
             'provisioning_sla' => $this->formatSla($this->provisioning_sla_hours),
+            'image' => $this->image,
             'provider' => [
                 'name' => $this->whenLoaded('provider')?->name,
                 'verified' => $this->whenLoaded('provider')?->verification_status === 'verified',

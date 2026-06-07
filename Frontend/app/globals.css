@@ -539,6 +539,52 @@ body {
   to { opacity: 1; }
 }
 
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Cart drawer slide-over (right → left) — legacy, kept for reference */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translate3d(100%, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Cart modal centered pop-in with scale */
+@keyframes modalScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .animate-fade-in-right {
   animation: fade-in-right 0.8s var(--ease-signature) both;
 }
@@ -831,5 +877,55 @@ body {
   .studio .reveal-rise {
     opacity: 1 !important;
     transform: none !important;
+  }
+}
+
+/* ───── Admin sidebar link transitions ────────────────────────────── */
+.studio-sidebar-link {
+  position: relative;
+}
+.studio-sidebar-link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: var(--color-accent);
+  border-radius: 0 4px 4px 0;
+  transition: width var(--dur-standard) var(--ease-signature);
+}
+.studio-sidebar-link:hover::before {
+  width: 2px;
+}
+
+/* ───── Admin dashboard subtle ambient glow ───────────────────────── */
+.studio .admin-glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 9999px;
+  filter: blur(120px);
+  opacity: 0.08;
+  pointer-events: none;
+  animation: ambient-pulse 8s var(--ease-ambient) infinite;
+}
+
+/* ───── Tailwind v4 arbitrary grid-columns workaround ─────────────── */
+/* Tailwind v4 does not generate CSS for arbitrary grid-cols with fr/minmax units.
+   These classes provide the layouts that would otherwise use lg:grid-cols-[…]. */
+@media (min-width: 1024px) {
+  .docs-layout-grid {
+    grid-template-columns: 260px minmax(0, 1fr);
+  }
+  .docs-footer-grid,
+  .footer-4col-grid {
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  }
+  .pricing-estimator-grid {
+    grid-template-columns: 1fr auto 360px;
+  }
+  .admin-2col-grid {
+    grid-template-columns: 0.85fr 1.15fr;
   }
 }

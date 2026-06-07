@@ -15,6 +15,7 @@ interface Product {
   currency: string;
   availability: string;
   provisioning_sla: string;
+  image?: string | null;
   provider: { name: string; verified: boolean };
 }
 
@@ -49,7 +50,7 @@ export function CatalogExplorer() {
     let alive = true;
     (async () => {
       try {
-        const res = await fetch("/api/marketplace/listings?per_page=12");
+        const res = await fetch("/api/v1/marketplace/listings?per_page=12");
         const data = await res.json();
         if (alive) setProducts(data.data || []);
       } catch (e) {
@@ -133,11 +134,19 @@ export function CatalogExplorer() {
                         "radial-gradient(60% 60% at 50% 40%, rgba(255,116,0,0.16), transparent 70%)",
                     }}
                   />
-                  <span className="material-symbols-outlined relative text-[64px] text-fg/70">
-                    {iconFor(p.resource_type)}
-                  </span>
+                  {p.image ? (
+                    <img
+                      src={`/${p.image}`}
+                      alt={p.name}
+                      className="relative h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                    />
+                  ) : (
+                    <span className="material-symbols-outlined relative text-[64px] text-fg/70">
+                      {iconFor(p.resource_type)}
+                    </span>
+                  )}
                   <span
-                    className="absolute right-3 top-3 h-2 w-2 rounded-full"
+                    className="absolute right-3 top-3 z-10 h-2 w-2 rounded-full"
                     style={{
                       background: tone.dot,
                       boxShadow: `0 0 8px 1px ${tone.dot}`,

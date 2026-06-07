@@ -248,14 +248,16 @@ export interface AdminListingData {
   slug: string;
   description: string | null;
   region: string;
-  specs_summary: string | null;
+  resource_type: { slug: string; name: string } | null;
+  specs: Record<string, string | number> | null;
+  specs_summary?: string | null;
+  image?: string | null;
   availability_status: string;
   provisioning_sla_hours: number;
   is_active: boolean;
   sort_order: number;
   provider: { public_id: string; name: string } | null;
   category: { public_id: string; slug: string; name: string } | null;
-  resource_type: { slug: string; name: string } | null;
   prices: AdminListingPrice[];
   last_audit: AdminListingAudit | null;
   created_at: string;
@@ -291,6 +293,12 @@ export async function adminListListings(
 export async function adminUpdateListing(
   id: number,
   data: {
+    name?: string;
+    description?: string | null;
+    resource_type?: string;
+    region?: string;
+    display_priority?: number;
+    specs?: Record<string, string | number>;
     availability_status?: string;
     provisioning_sla_hours?: number;
     is_active?: boolean;
@@ -301,4 +309,60 @@ export async function adminUpdateListing(
     `/api/v1/admin/listings/${id}`,
     data,
   );
+}
+
+// ─── Listing form options + create/delete ─────────────────────────────────────
+
+export interface ListingFormOptions {
+  providers: Array<{ id: number; public_id: string; name: string }>;
+  categories: Array<{ id: number; public_id: string; name: string; slug: string }>;
+  resource_types: string[];
+  regions: string[];
+  availability_options: string[];
+  billing_cycles: string[];
+}
+
+export interface CreateListingData {
+  provider_id: number;
+  category_id: number;
+  name: string;
+  slug: string;
+  description?: string | null;
+  resource_type: string;
+  region: string;
+  availability_status: string;
+  provisioning_sla_hours: number;
+  display_priority?: number;
+  is_active?: boolean;
+  specs?: Record<string, string | number>;
+  prices: Array<{ billing_cycle: string; gross_price_minor: number }>;
+}
+
+/**
+ * Admin: fetch the providers/categories/suggestions needed to build the
+ * create/edit product form.
+ */
+export async function adminGetListingFormOptions(): Promise<ListingFormOptions> {
+  return api.get<ListingFormOptions>("/api/v1/admin/listings/form-options");
+}
+
+/**
+ * Admin: create a new product listing.
+ */
+export async function adminCreateListing(
+  data: CreateListingData,
+): Promise<{ message: string; data: AdminListingData }> {
+  return api.post<{ message: string; data: AdminListingData }>(
+    "/api/v1/admin/listings",
+    data,
+  );
+}
+
+/**
+ * Admin: delete (soft) a product listing.
+ */
+export async function adminDeleteListing(
+  id: number,
+): Promise<{ message: string }> {
+  return api.delete<{ message: string }>(`/api/v1/admin/listings/${id}`);
 }

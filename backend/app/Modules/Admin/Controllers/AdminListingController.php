@@ -2,13 +2,17 @@
 
 namespace App\Modules\Admin\Controllers;
 
+use App\Http\Requests\AdminStoreListingRequest;
 use App\Http\Requests\AdminUpdateListingRequest;
 use App\Http\Resources\AdminListingResource;
 use App\Models\AdminAuditLog;
-use App\Models\ListingPrice;
-use App\Models\ProductListing;
+use App\Modules\Marketplace\Models\ProductCategory;
+use App\Modules\Marketplace\Models\ResourceProduct;
+use App\Modules\Order\Models\ProductPrice;
+use App\Modules\Provider\Models\Provider;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AdminListingController
 {
@@ -18,8 +22,8 @@ class AdminListingController
      */
     public function index(Request $request): JsonResponse
     {
-        $query = ProductListing::query()
-            ->with(['provider', 'category', 'resourceType', 'prices', 'latestAuditLog.user']);
+        $query = ResourceProduct::query()
+            ->with(['provider', 'category', 'prices', 'latestAuditLog.user']);
 
         // Search by name or slug
         if ($request->filled('search')) {
@@ -32,7 +36,7 @@ class AdminListingController
 
         // Filter by provider
         if ($request->filled('provider_id')) {
-            $query->where('provider_profile_id', $request->input('provider_id'));
+            $query->where('provider_id', $request->input('provider_id'));
         }
 
         // Filter by category
@@ -57,7 +61,7 @@ class AdminListingController
 
         $sortBy = $request->input('sort_by', 'created_at');
         $sortDir = $request->input('sort_dir', 'desc');
-        $allowedSorts = ['name', 'created_at', 'updated_at', 'provisioning_sla_hours', 'sort_order'];
+        $allowedSorts = ['name', 'created_at', 'updated_at', 'provisioning_sla_hours', 'display_priority'];
 
         if (in_array($sortBy, $allowedSorts)) {
             $query->orderBy($sortBy, $sortDir === 'asc' ? 'asc' : 'desc');
@@ -78,12 +82,114 @@ class AdminListingController
     }
 
     /**
+     * Provide the select-option data needed to populate the create/edit form:
+     * active providers, active categories, and distinct existing values to
+     * suggest for the free-text resource_type and region fields.
+     */
+    public function formOptions(): JsonResponse
+    {
+        $providers = Provider::orderBy('name')
+            ->get(['id', 'public_id', 'name'])
+            ->map(fn (Provider $p) => [
+                'id' => $p->id,
+                'public_id' => $p->public_id,
+                'name' => $p->name,
+            ]);
+
+        $categories = ProductCategory::where('is_active', true)
+            ->orderBy('sort_order')
+            ->get(['id', 'public_id', 'name', 'slug'])
+            ->map(fn (ProductCategory $c) => [
+                'id' => $c->id,
+                'public_id' => $c->public_id,
+                'name' => $c->name,
+                'slug' => $c->slug,
+            ]);
+
+        return response()->json([
+            'providers' => $providers,
+            'categories' => $categories,
+            'resource_types' => ResourceProduct::query()
+                ->whereNotNull('resource_type')
+                ->distinct()
+                ->orderBy('resource_type')
+                ->pluck('resource_type'),
+            'regions' => ResourceProduct::query()
+                ->whereNotNull('region')
+                ->distinct()
+                ->orderBy('region')
+                ->pluck('region'),
+            'availability_options' => ['available', 'limited', 'waitlist', 'unavailable'],
+            'billing_cycles' => ['monthly', 'yearly'],
+        ]);
+    }
+
+    /**
+     * Create a new product listing with its prices. Audit logs the creation.
+     */
+    public function store(AdminStoreListingRequest $request): JsonResponse
+    {
+        $validated = $request->validated();
+
+        $listing = new ResourceProduct();
+        $listing->public_id = (string) Str::ulid();
+        $listing->provider_id = $validated['provider_id'];
+        $listing->category_id = $validated['category_id'];
+        $listing->name = $validated['name'];
+        $listing->slug = $validated['slug'];
+        $listing->description = $validated['description'] ?? null;
+        $listing->resource_type = $validated['resource_type'];
+        $listing->region = $validated['region'];
+        $listing->availability_status = $validated['availability_status'];
+        $listing->provisioning_sla_hours = $validated['provisioning_sla_hours'];
+        $listing->display_priority = $validated['display_priority'] ?? 0;
+        $listing->is_active = $validated['is_active'] ?? true;
+        $listing->specs = ! empty($validated['specs']) ? $validated['specs'] : null;
+        $listing->trust_indicators = [
+            'provider_verified' => true,
+            'provisioning_sla_hours' => $validated['provisioning_sla_hours'],
+            'dispute_protection' => true,
+        ];
+        $listing->save();
+
+        foreach ($validated['prices'] as $priceInput) {
+            $listing->prices()->create([
+                'public_id' => (string) Str::ulid(),
+                'billing_cycle' => $priceInput['billing_cycle'],
+                'gross_price_minor' => (int) $priceInput['gross_price_minor'],
+                'currency' => 'IDR',
+                'is_default' => $priceInput['billing_cycle'] === 'monthly',
+            ]);
+        }
+
+        AdminAuditLog::create([
+            'user_id' => $request->user()->id,
+            'action' => 'listing_created',
+            'subject_type' => ResourceProduct::class,
+            'subject_id' => $listing->id,
+            'payload' => [
+                'name' => $listing->name,
+                'slug' => $listing->slug,
+                'provider_id' => $listing->provider_id,
+                'category_id' => $listing->category_id,
+            ],
+        ]);
+
+        $listing->load(['provider', 'category', 'prices', 'latestAuditLog.user']);
+
+        return response()->json([
+            'message' => 'Produk berhasil dibuat.',
+            'data' => new AdminListingResource($listing),
+        ], 201);
+    }
+
+    /**
      * Update a product listing's price, availability, SLA, and active status.
      * Audit logs the change.
      */
     public function update(AdminUpdateListingRequest $request, int $id): JsonResponse
     {
-        $listing = ProductListing::with(['provider', 'category', 'resourceType', 'prices'])->find($id);
+        $listing = ResourceProduct::with(['provider', 'category', 'prices'])->find($id);
 
         if (! $listing) {
             return response()->json([
@@ -93,6 +199,34 @@ class AdminListingController
 
         $changes = [];
         $payload = [];
+
+        // Update simple scalar fields (name, description, resource_type, region, display_priority)
+        $simpleFields = ['name', 'description', 'resource_type', 'region', 'display_priority'];
+        foreach ($simpleFields as $field) {
+            if (! $request->has($field)) {
+                continue;
+            }
+            $new = $field === 'display_priority'
+                ? (int) $request->input($field)
+                : $request->input($field);
+            $old = $listing->{$field};
+            if ($old !== $new) {
+                $changes[] = $field;
+                $payload[$field] = ['old' => $old, 'new' => $new];
+                $listing->{$field} = $new;
+            }
+        }
+
+        // Update specs (replace the whole spec map when provided)
+        if ($request->has('specs') && is_array($request->input('specs'))) {
+            $new = $request->input('specs');
+            $old = $listing->specs;
+            if ($old !== $new) {
+                $changes[] = 'specs';
+                $payload['specs'] = ['old' => $old, 'new' => $new];
+                $listing->specs = $new;
+            }
+        }
 
         // Update availability_status
         if ($request->filled('availability_status')) {
@@ -141,31 +275,29 @@ class AdminListingController
 
                 $price = $listing->prices()->where('billing_cycle', $cycle)->first();
                 if ($price) {
-                    $oldPrice = (float) $price->price;
-                    $newPrice = $newMinor / 100;
-                    if (abs($oldPrice - $newPrice) > 0.001) {
+                    $oldMinor = (int) $price->gross_price_minor;
+                    if ($oldMinor !== $newMinor) {
                         $priceChanges[] = [
                             'billing_cycle' => $cycle,
-                            'old_price' => $oldPrice,
-                            'new_price' => $newPrice,
+                            'old_gross_price_minor' => $oldMinor,
+                            'new_gross_price_minor' => $newMinor,
                         ];
-                        $price->price = $newPrice;
+                        $price->gross_price_minor = $newMinor;
                         $price->save();
                     }
                 } else {
                     // Create new price entry
                     $listing->prices()->create([
                         'billing_cycle' => $cycle,
-                        'price' => $newMinor / 100,
+                        'gross_price_minor' => $newMinor,
                         'currency' => 'IDR',
-                        'unit_label' => $cycle === 'monthly' ? '/bulan' : '/tahun',
                         'is_default' => $cycle === 'monthly',
                         'public_id' => \Illuminate\Support\Str::ulid()->toBase32(),
                     ]);
                     $priceChanges[] = [
                         'billing_cycle' => $cycle,
-                        'old_price' => null,
-                        'new_price' => $newMinor / 100,
+                        'old_gross_price_minor' => null,
+                        'new_gross_price_minor' => $newMinor,
                     ];
                 }
             }
@@ -181,7 +313,7 @@ class AdminListingController
             AdminAuditLog::create([
                 'user_id' => $request->user()->id,
                 'action' => 'listing_updated',
-                'subject_type' => ProductListing::class,
+                'subject_type' => ResourceProduct::class,
                 'subject_id' => $listing->id,
                 'payload' => [
                     'fields' => $changes,
@@ -191,11 +323,46 @@ class AdminListingController
         }
 
         // Reload relationships
-        $listing->load(['provider', 'category', 'resourceType', 'prices', 'latestAuditLog.user']);
+        $listing->load(['provider', 'category', 'prices', 'latestAuditLog.user']);
 
         return response()->json([
             'message' => 'Listing berhasil diperbarui.',
             'data' => new AdminListingResource($listing),
+        ]);
+    }
+
+    /**
+     * Soft-delete a product listing. Audit logs the deletion.
+     */
+    public function destroy(Request $request, int $id): JsonResponse
+    {
+        $listing = ResourceProduct::find($id);
+
+        if (! $listing) {
+            return response()->json([
+                'message' => 'Listing tidak ditemukan.',
+            ], 404);
+        }
+
+        $snapshot = [
+            'name' => $listing->name,
+            'slug' => $listing->slug,
+            'provider_id' => $listing->provider_id,
+            'category_id' => $listing->category_id,
+        ];
+
+        $listing->delete();
+
+        AdminAuditLog::create([
+            'user_id' => $request->user()->id,
+            'action' => 'listing_deleted',
+            'subject_type' => ResourceProduct::class,
+            'subject_id' => $id,
+            'payload' => $snapshot,
+        ]);
+
+        return response()->json([
+            'message' => 'Produk berhasil dihapus.',
         ]);
     }
 }

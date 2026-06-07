@@ -30,9 +30,9 @@ class DeploymentController
     /**
      * Customer: Show deployment detail.
      */
-    public function show(Request $request, int $id): JsonResponse
+    public function show(Request $request, string $id): JsonResponse
     {
-        $deployment = Deployment::where('id', $id)
+        $deployment = Deployment::where('public_id', $id)
             ->where('user_id', $request->user()->id)
             ->with(['provisioningTasks', 'resourceActions'])
             ->first();
@@ -51,9 +51,9 @@ class DeploymentController
     /**
      * Customer: Request a resource action (start/stop/restart).
      */
-    public function requestAction(ResourceActionRequest $request, int $id): JsonResponse
+    public function requestAction(ResourceActionRequest $request, string $id): JsonResponse
     {
-        $deployment = Deployment::where('id', $id)
+        $deployment = Deployment::where('public_id', $id)
             ->where('user_id', $request->user()->id)
             ->first();
 
@@ -106,11 +106,64 @@ class DeploymentController
     }
 
     /**
+     * Customer: Get deployment credentials (hostname, IP, decrypted credential).
+     */
+    public function credential(Request $request, string $id): JsonResponse
+    {
+        $deployment = Deployment::where('public_id', $id)
+            ->where('user_id', $request->user()->id)
+            ->first();
+
+        if (! $deployment) {
+            return response()->json([
+                'message' => 'Deployment tidak ditemukan.',
+            ], 404);
+        }
+
+        if ($deployment->status !== 'active' && $deployment->status !== 'provisioning') {
+            return response()->json([
+                'message' => 'Deployment belum aktif.',
+            ], 422);
+        }
+
+        return response()->json([
+            'hostname' => $deployment->hostname,
+            'ip_address' => $deployment->ip_address,
+            'credential' => $deployment->access_credential_encrypted,
+            'ssh_keys' => \App\Modules\Deployment\Models\SshKey::where('user_id', $request->user()->id)->get(['id', 'public_id', 'name', 'fingerprint']),
+        ]);
+    }
+
+    /**
+     * Customer: Get SSH keys associated with a deployment.
+     */
+    public function sshKeys(Request $request, string $id): JsonResponse
+    {
+        $deployment = Deployment::where('public_id', $id)
+            ->where('user_id', $request->user()->id)
+            ->first();
+
+        if (! $deployment) {
+            return response()->json([
+                'message' => 'Deployment tidak ditemukan.',
+            ], 404);
+        }
+
+        $keys = \App\Modules\Deployment\Models\SshKey::where('user_id', $request->user()->id)
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'ssh_keys' => $keys,
+        ]);
+    }
+
+    /**
      * Customer: Cancel at period end (disable auto-renewal).
      */
-    public function cancelAtPeriodEnd(Request $request, int $id): JsonResponse
+    public function cancelAtPeriodEnd(Request $request, string $id): JsonResponse
     {
-        $deployment = Deployment::where('id', $id)
+        $deployment = Deployment::where('public_id', $id)
             ->where('user_id', $request->user()->id)
             ->first();
 

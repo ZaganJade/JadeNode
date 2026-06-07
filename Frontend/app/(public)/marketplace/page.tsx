@@ -8,6 +8,7 @@ import { StudioNav } from "@/components/landing/studio/studio-nav";
 import { ScrollRail } from "@/components/landing/studio/scroll-rail";
 import { NetworkPaths } from "@/components/landing/studio/network-paths";
 import { RegionGlobe } from "@/components/landing/studio/region-globe";
+import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 
 // ─── Types (match backend ResourceProductResource) ──────────────────────────
 
@@ -15,6 +16,7 @@ interface ProductSpec {
   cpu: string;
   ram: string;
   storage: string;
+  [key: string]: string | number | undefined | null;
 }
 
 interface Product {
@@ -30,6 +32,7 @@ interface Product {
   currency: string;
   availability: "available" | "limited" | "waitlist" | "unavailable";
   provisioning_sla: string;
+  image?: string | null;
   provider: {
     name: string;
     verified: boolean;
@@ -147,6 +150,37 @@ function formatRupiah(value: number) {
   }).format(value);
 }
 
+// ─── Product image with fallback icon ──────────────────────────────────────
+function ProductImage({ src, alt, iconName, isHovered }: { src: string | null | undefined; alt: string; iconName: string; isHovered: boolean }) {
+  const [imgError, setImgError] = useState(false);
+  const hasImage = src && !imgError;
+
+  return (
+    <div className="relative grid aspect-square place-items-center overflow-hidden rounded-xl border border-line/80 bg-gradient-to-br from-white/[0.04] to-transparent">
+      <div
+        className="absolute inset-0 transition-opacity duration-500"
+        style={{
+          background:
+            "radial-gradient(60% 60% at 50% 40%, rgba(255,116,0,0.16), transparent 70%)",
+          opacity: isHovered ? 0.85 : 0.5,
+        }}
+      />
+      {hasImage ? (
+        <img
+          src={src}
+          alt={alt}
+          onError={() => setImgError(true)}
+          className="relative h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      ) : (
+        <span className="material-symbols-outlined relative text-[64px] text-fg/70 transition-transform duration-500 group-hover:scale-110">
+          {iconName}
+        </span>
+      )}
+    </div>
+  );
+}
+
 // ─── Product Card (studio card style, marketplace-scope content) ────────────
 
 function ProductCard({ listing, index }: { listing: Product; index: number }) {
@@ -187,32 +221,25 @@ function ProductCard({ listing, index }: { listing: Product; index: number }) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Visual — same aesthetic as CatalogExplorer */}
-      <div className="relative grid aspect-square place-items-center overflow-hidden rounded-xl border border-line/80 bg-gradient-to-br from-white/[0.04] to-transparent">
-        <div
-          className="absolute inset-0 transition-opacity duration-500"
-          style={{
-            background:
-              "radial-gradient(60% 60% at 50% 40%, rgba(255,116,0,0.16), transparent 70%)",
-            opacity: isHovered ? 0.85 : 0.5,
-          }}
-        />
-        <span className="material-symbols-outlined relative text-[64px] text-fg/70 transition-transform duration-500 group-hover:scale-110">
-          {iconName}
-        </span>
+      {/* Visual — product image with fallback icon */}
+      <ProductImage
+        src={listing.image ? `/${listing.image}` : null}
+        alt={listing.name}
+        iconName={iconName}
+        isHovered={isHovered}
+      />
         {/* Resource type pill (top-left, mirrors landing cards) */}
-        <span className="absolute left-3 top-3 rounded-md border border-accent/30 bg-accent/10 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-accent">
+        <span className="absolute left-3 top-3 z-10 rounded-md border border-accent/30 bg-accent/10 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-accent">
           {listing.resource_type}
         </span>
         {/* Status dot (top-right) */}
         <span
-          className="absolute right-3 top-3 h-2 w-2 rounded-full"
+          className="absolute right-3 top-3 z-10 h-2 w-2 rounded-full"
           style={{
             background: tone.dot,
             boxShadow: `0 0 8px 1px ${tone.dot}`,
           }}
         />
-      </div>
 
       {/* Body */}
       <div className="flex flex-1 flex-col px-1.5 pt-4">
@@ -271,19 +298,38 @@ function ProductCard({ listing, index }: { listing: Product; index: number }) {
               </span>
             </span>
           </div>
-          <Link
-            href={listing.availability === "unavailable" ? "#" : `/marketplace/${listing.slug}`}
-            className={`group/btn mt-3 flex h-9 items-center justify-center gap-1.5 rounded-lg border text-[12px] font-semibold transition-all ${
-              listing.availability === "unavailable"
-                ? "border-line text-fg-dim cursor-not-allowed"
-                : "border-line-strong text-fg hover:border-accent hover:bg-accent hover:text-accent-fg"
-            }`}
-          >
-            <span className="material-symbols-outlined text-[16px]">
-              {listing.availability === "unavailable" ? "block" : "arrow_forward"}
-            </span>
-            {listing.availability === "unavailable" ? "Stok habis" : "Lihat detail"}
-          </Link>
+          <div className="mt-3 flex items-center gap-2">
+            <Link
+              href={listing.availability === "unavailable" ? "#" : `/marketplace/${listing.slug}`}
+              className={`group/btn flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg border text-[12px] font-semibold transition-all ${
+                listing.availability === "unavailable"
+                  ? "border-line text-fg-dim cursor-not-allowed"
+                  : "border-line-strong text-fg hover:border-accent hover:bg-accent hover:text-accent-fg"
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px]">
+                {listing.availability === "unavailable" ? "block" : "arrow_forward"}
+              </span>
+              {listing.availability === "unavailable" ? "Stok habis" : "Lihat detail"}
+            </Link>
+            <AddToCartButton
+              variant="icon"
+              disabled={listing.availability === "unavailable"}
+              item={{
+                slug: listing.slug,
+                name: listing.name,
+                image: listing.image ? `/${listing.image}` : null,
+                resource_type: listing.resource_type,
+                region: listing.region,
+                provider: listing.provider,
+                specs: listing.specs,
+                availability: listing.availability,
+                currency: listing.currency,
+                pricing: [{ cycle: listing.billing_cycle, price: listing.price }],
+                cycle: listing.billing_cycle,
+              }}
+            />
+          </div>
         </div>
       </div>
     </article>
@@ -627,7 +673,7 @@ function MarketplaceContent() {
       if (filters.billing_cycle) params.billing_cycle = filters.billing_cycle;
 
       const queryParams = new URLSearchParams(params).toString();
-      const res = await fetch(`/api/marketplace/listings${queryParams ? `?${queryParams}` : ""}`);
+      const res = await fetch(`/api/v1/marketplace/listings${queryParams ? `?${queryParams}` : ""}`);
       if (!res.ok) throw new Error("Failed to fetch");
       const data: ListingResponse = await res.json();
       setProducts(data.data || []);
@@ -971,7 +1017,7 @@ export default function MarketplacePage() {
       {/* ───────────────────────── FOOTER ───────────────────────── */}
       <footer className="border-t border-line/70 px-6 py-16">
         <div className="mx-auto max-w-[1320px]">
-          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div className="footer-4col-grid grid gap-10 md:grid-cols-2">
             <div>
               <div className="flex items-center gap-2.5">
                 <span className="relative grid h-7 w-7 place-items-center">

@@ -2,4 +2,5 @@ packages:
   - "frontend"
   - "packages/*"
 allowBuilds:
+  msgpackr-extract: set this to true or false
   sharp: true

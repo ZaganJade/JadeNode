@@ -61,6 +61,7 @@ class MarketplaceSeeder extends Seeder
                 'availability_status' => 'available',
                 'provisioning_sla_hours' => 24,
                 'display_priority' => 10,
+                'image' => 'products/vps-starter.svg',
                 'trust_indicators' => [
                     'provider_verified' => true,
                     'provisioning_sla_hours' => 24,
@@ -88,6 +89,7 @@ class MarketplaceSeeder extends Seeder
                 'availability_status' => 'available',
                 'provisioning_sla_hours' => 24,
                 'display_priority' => 20,
+                'image' => 'products/vps-basic.svg',
                 'trust_indicators' => [
                     'provider_verified' => true,
                     'provisioning_sla_hours' => 24,
@@ -115,6 +117,7 @@ class MarketplaceSeeder extends Seeder
                 'availability_status' => 'available',
                 'provisioning_sla_hours' => 24,
                 'display_priority' => 30,
+                'image' => 'products/vps-pro.svg',
                 'trust_indicators' => [
                     'provider_verified' => true,
                     'provisioning_sla_hours' => 24,
@@ -142,6 +145,7 @@ class MarketplaceSeeder extends Seeder
                 'availability_status' => 'limited',
                 'provisioning_sla_hours' => 12,
                 'display_priority' => 40,
+                'image' => 'products/vps-enterprise.svg',
                 'trust_indicators' => [
                     'provider_verified' => true,
                     'provisioning_sla_hours' => 12,
@@ -194,6 +198,7 @@ class MarketplaceSeeder extends Seeder
                 'availability_status' => 'available',
                 'provisioning_sla_hours' => 48,
                 'display_priority' => 50,
+                'image' => 'products/dedicated-standard.svg',
                 'trust_indicators' => [
                     'provider_verified' => true,
                     'provisioning_sla_hours' => 48,

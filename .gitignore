@@ -19,6 +19,12 @@ apps/web/out/
 apps/web/build/
 apps/web/coverage/
 apps/web/next-env.d.ts
+# Frontend (actual Next.js app location for this project)
+Frontend/.next/
+Frontend/out/
+Frontend/build/
+Frontend/coverage/
+Frontend/next-env.d.ts
 
 # PHP / Laravel
 backend/vendor/
@@ -91,3 +97,4 @@ bmad
 context.md
 design.md
 progress.md
+

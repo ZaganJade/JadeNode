@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent, useEffect, Suspense } from "react";
-import { login } from "@/lib/auth";
+import { login, getSession } from "@/lib/auth";
 import { ApiException } from "@/lib/api";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -122,6 +122,16 @@ function LoginContent() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // If the user already has a valid session, redirect away from login.
+    getSession().then((session) => {
+      if (session.authenticated) {
+        const redirectTo = searchParams.get("redirect");
+        router.replace(redirectTo ?? (session.user?.role === "admin" ? "/admin" : "/dashboard"));
+      }
+    }).catch(() => { /* not authenticated, stay on login */ });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
     if (searchParams.get("registered") === "1") {
       setSuccessMessage("Registrasi berhasil! Silakan masuk dengan akun kamu.");
     }
@@ -137,8 +147,15 @@ function LoginContent() {
     setLoading(true);
 
     try {
-      await login(form.email, form.password);
-      router.push("/dashboard");
+      const res = await login(form.email, form.password);
+      const redirectTo = searchParams.get("redirect");
+      if (redirectTo) {
+        router.push(redirectTo);
+      } else if (res.user.role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (error) {
       if (error instanceof ApiException) {
         if (error.status === 422 && typeof error.detail === "object" && error.detail !== null) {

@@ -25,6 +25,7 @@ class ResourceProduct extends Model
         'is_active',
         'trust_indicators',
         'specs',
+        'image',
     ];
 
     protected $hidden = [
@@ -53,5 +54,12 @@ class ResourceProduct extends Model
     public function prices()
     {
         return $this->hasMany(\App\Modules\Order\Models\ProductPrice::class, 'product_id');
+    }
+
+    public function latestAuditLog()
+    {
+        return $this->hasOne(\App\Models\AdminAuditLog::class, 'subject_id')
+            ->where('subject_type', static::class)
+            ->latestOfMany();
     }
 }

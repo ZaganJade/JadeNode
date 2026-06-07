@@ -44,7 +44,7 @@ export function PricingEstimator() {
   const yearly = total * 12 * 0.92; // 8% annual discount
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_auto_360px] lg:items-start">
+    <div className="pricing-estimator-grid grid gap-8 items-start">
       {/* Sliders */}
       <div className="space-y-7">
         <Slider

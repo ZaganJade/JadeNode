@@ -4,6 +4,7 @@ namespace App\Modules\Auth\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class EmailVerificationController
 {
@@ -29,6 +30,9 @@ class EmailVerificationController
 
     /**
      * Verify the user's email address.
+     *
+     * Validates the token by hashing it and comparing against the stored
+     * hash in the user's email_verification_token column.
      */
     public function verify(Request $request): JsonResponse
     {
@@ -38,15 +42,6 @@ class EmailVerificationController
         ]);
 
         $user = $request->user();
-
-        // Verify the token matches the hash stored for this user
-        $hash = sha1($request->input('email'));
-
-        if (! hash_equals($request->input('token'), $hash)) {
-            return response()->json([
-                'message' => 'Token verifikasi tidak valid.',
-            ], 403);
-        }
 
         if ($user->hasVerifiedEmail()) {
             return response()->json([
@@ -60,7 +55,21 @@ class EmailVerificationController
             ], 403);
         }
 
+        // Compare hashed token against stored hash
+        $tokenHash = Hash::sha256($request->input('token'));
+
+        if (! $user->email_verification_token || ! hash_equals($user->email_verification_token, $tokenHash)) {
+            return response()->json([
+                'message' => 'Token verifikasi tidak valid atau sudah kadaluarsa.',
+            ], 403);
+        }
+
         $user->markEmailAsVerified();
+
+        // Clear the token after successful verification
+        $user->update([
+            'email_verification_token' => null,
+        ]);
 
         return response()->json([
             'message' => 'Email berhasil diverifikasi.',

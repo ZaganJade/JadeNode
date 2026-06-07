@@ -24,6 +24,7 @@ class InvoiceResource extends JsonResource
             'currency' => $this->currency,
             'due_at' => $this->due_at?->toIso8601String(),
             'paid_at' => $this->paid_at?->toIso8601String(),
+            'order' => new OrderResource($this->whenLoaded('order')),
             'payments' => PaymentResource::collection($this->whenLoaded('payments')),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),

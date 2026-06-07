@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { CartButton } from "@/components/cart/cart-button";
 
 const PRIMARY = [
   { label: "Marketplace", href: "/marketplace" },
+  { label: "Layanan", href: "/layanan" },
   { label: "Lifecycle", href: "/lifecycle" },
-  { label: "Layanan", href: "#bento" },
+  { label: "Artikel", href: "/articles" },
 ];
 
 /**
@@ -112,6 +114,7 @@ export function StudioNav() {
             >
               Masuk
             </Link>
+            <CartButton />
             <a
               href="#mulai"
               className="group relative inline-flex h-9 items-center gap-1.5 overflow-hidden rounded-md bg-accent px-4 text-[13px] font-semibold text-accent-fg"

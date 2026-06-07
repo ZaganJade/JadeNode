@@ -348,11 +348,9 @@ export default function InvoiceDetailPage() {
       {/* ─── Actions ──────────────────────────────────────────────────────── */}
       <div className="flex flex-wrap gap-3">
         {isPaid && (
-          <a
-            href={`${process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000"}/api/v1/invoices/${invoice.public_id}/pdf`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full bg-[#FFBF00] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] shadow-[0_0_20px_rgba(255,191,0,0.25)] transition-all hover:shadow-[0_0_30px_rgba(255,191,0,0.4)]"
+          <span
+            title="PDF generation coming soon"
+            className="pointer-events-none inline-flex items-center gap-2 rounded-full bg-[#FFBF00] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] opacity-50 cursor-not-allowed"
           >
             <svg
               className="h-4 w-4"
@@ -368,7 +366,8 @@ export default function InvoiceDetailPage() {
               />
             </svg>
             Unduh PDF
-          </a>
+            <span className="text-[10px] font-normal opacity-70">(segera)</span>
+          </span>
         )}
 
         {invoice.status === "pending" && invoice.order_public_id && (

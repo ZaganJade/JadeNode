@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <defs>
+    <radialGradient id="bg-vps-basic.png" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1a1408"/>
+      <stop offset="100%" stop-color="#0a0800"/>
+    </radialGradient>
+    <radialGradient id="glow-vps-basic.png" cx="55%" cy="45%" r="40%">
+      <stop offset="0%" stop-color="#ff7400" stop-opacity="0.25"/>
+      <stop offset="60%" stop-color="#ff7400" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#ff7400" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur-vps-basic.png">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2"/>
+    </filter>
+    <linearGradient id="accent-line-vps-basic.png" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff7400" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#ff7400" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#ff7400" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="icon-fill-vps-basic.png" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff7400" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#ff7400" stop-opacity="0.5"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="600" fill="url(#bg-vps-basic.png)"/>
+  
+  <!-- Glow -->
+  <rect width="600" height="600" fill="url(#glow-vps-basic.png)"/>
+
+  <!-- Grid pattern (subtle) -->
+  <g stroke="#ff7400" stroke-opacity="0.04" stroke-width="0.5">
+    <line x1="0" y1="0" x2="0" y2="600"/>
+    <line x1="50" y1="0" x2="50" y2="600"/>
+    <line x1="100" y1="0" x2="100" y2="600"/>
+    <line x1="150" y1="0" x2="150" y2="600"/>
+    <line x1="200" y1="0" x2="200" y2="600"/>
+    <line x1="250" y1="0" x2="250" y2="600"/>
+    <line x1="300" y1="0" x2="300" y2="600"/>
+    <line x1="350" y1="0" x2="350" y2="600"/>
+    <line x1="400" y1="0" x2="400" y2="600"/>
+    <line x1="450" y1="0" x2="450" y2="600"/>
+    <line x1="500" y1="0" x2="500" y2="600"/>
+    <line x1="550" y1="0" x2="550" y2="600"/>
+    <line x1="600" y1="0" x2="600" y2="600"/>
+    <line x1="0" y1="0" x2="600" y2="0"/>
+    <line x1="0" y1="50" x2="600" y2="50"/>
+    <line x1="0" y1="100" x2="600" y2="100"/>
+    <line x1="0" y1="150" x2="600" y2="150"/>
+    <line x1="0" y1="200" x2="600" y2="200"/>
+    <line x1="0" y1="250" x2="600" y2="250"/>
+    <line x1="0" y1="300" x2="600" y2="300"/>
+    <line x1="0" y1="350" x2="600" y2="350"/>
+    <line x1="0" y1="400" x2="600" y2="400"/>
+    <line x1="0" y1="450" x2="600" y2="450"/>
+    <line x1="0" y1="500" x2="600" y2="500"/>
+    <line x1="0" y1="550" x2="600" y2="550"/>
+    <line x1="0" y1="600" x2="600" y2="600"/>
+  </g>
+
+  <!-- Circuit lines -->
+  
+    <path d="M80,120 L80,250 L200,250 L200,180" fill="none" stroke="#ff7400" stroke-opacity="0.08" stroke-width="1"/>
+    <path d="M520,350 L520,200 L450,200" fill="none" stroke="#ff7400" stroke-opacity="0.08" stroke-width="1"/>
+    <circle cx="200" cy="180" r="3" fill="#ff7400" opacity="0.12"/>
+    <circle cx="450" cy="200" r="3" fill="#ff7400" opacity="0.12"/>
+  
+
+  <!-- Central icon -->
+  <g transform="translate(300, 260)" fill="none" stroke="url(#icon-fill-vps-basic.png)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    
+    <rect x="-30" y="-30" width="60" height="60" rx="6" stroke-width="2.5"/>
+    <line x1="-20" y1="-16" x2="20" y2="-16" stroke-width="1.5" opacity="0.6"/>
+    <line x1="-20" y1="-4" x2="20" y2="-4" stroke-width="1.5" opacity="0.6"/>
+    <line x1="-20" y1="8" x2="12" y2="8" stroke-width="1.5" opacity="0.6"/>
+    <rect x="-14" y="16" width="8" height="8" rx="1" stroke-width="1" opacity="0.5"/>
+    <rect x="6" y="16" width="8" height="8" rx="1" stroke-width="1" opacity="0.5"/>
+  
+  </g>
+
+  <!-- Glow behind icon -->
+  <circle cx="300" cy="260" r="60" fill="#ff7400" opacity="0.06" filter="url(#blur-vps-basic.png)"/>
+
+  <!-- Title -->
+  <text x="300" y="420" text-anchor="middle" font-family="monospace" font-size="28" font-weight="bold" fill="white" opacity="0.95">VPS Basic</text>
+  
+  <!-- Subtitle -->
+  <text x="300" y="450" text-anchor="middle" font-family="monospace" font-size="14" fill="#ff7400" opacity="0.7" letter-spacing="4">2 VCPU · 2GB</text>
+
+  <!-- Bottom accent line -->
+  <line x1="200" y1="480" x2="400" y2="480" stroke="url(#accent-line-vps-basic.png)" stroke-width="1.5"/>
+
+  <!-- Corner accents -->
+  <polyline points="20,50 20,20 50,20" fill="none" stroke="#ff7400" stroke-opacity="0.3" stroke-width="1.5"/>
+  <polyline points="550,20 580,20 580,50" fill="none" stroke="#ff7400" stroke-opacity="0.3" stroke-width="1.5"/>
+  <polyline points="20,550 20,580 50,580" fill="none" stroke="#ff7400" stroke-opacity="0.3" stroke-width="1.5"/>
+  <polyline points="550,580 580,580 580,550" fill="none" stroke="#ff7400" stroke-opacity="0.3" stroke-width="1.5"/>
+</svg>

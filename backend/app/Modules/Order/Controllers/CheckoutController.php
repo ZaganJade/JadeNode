@@ -162,9 +162,9 @@ class CheckoutController
     /**
      * Show order detail with items, invoice, and payment status.
      */
-    public function show(Request $request, int $id): JsonResponse
+    public function show(Request $request, string $id): JsonResponse
     {
-        $order = Order::where('id', $id)
+        $order = Order::where('public_id', $id)
             ->where('user_id', $request->user()->id)
             ->with(['items', 'invoices.payments'])
             ->first();

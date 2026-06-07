@@ -50,6 +50,7 @@ async function request<T>(
     ...rest,
     headers,
     body: body ? JSON.stringify(body) : undefined,
+    credentials: "include",
   });
 
   console.log('API Response:', res.status, res.ok); // Debug logging

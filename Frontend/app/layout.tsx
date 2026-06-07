@@ -3,6 +3,8 @@ import { Geist, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { CursorFollower } from "@/components/landing/cursor-follower";
 import { ScrollProgress } from "@/components/landing/scroll-progress";
+import { CartProvider } from "@/lib/cart";
+import { CartDrawer } from "@/components/cart/cart-drawer";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -51,9 +53,12 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-bg text-fg font-sans antialiased">
-        <ScrollProgress />
-        <CursorFollower />
-        {children}
+        <CartProvider>
+          <ScrollProgress />
+          <CursorFollower />
+          {children}
+          <CartDrawer />
+        </CartProvider>
       </body>
     </html>
   );

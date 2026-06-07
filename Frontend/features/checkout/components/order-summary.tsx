@@ -1,7 +1,6 @@
 "use client";
 
 import { formatPrice, formatBillingCycle } from "@/lib/formatters";
-import type { SpecItem } from "@/lib/formatters";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -48,8 +47,8 @@ const specLabels: Record<string, string> = {
 // ─── Component ──────────────────────────────────────────────────────────────
 
 /**
- * Glass panel showing order details before payment.
- * Displays product snapshot, price breakdown, billing cycle, provider, and SLA.
+ * Studio-styled order summary panel.
+ * Matches the marketplace's editorial dark + orange accent design.
  */
 export function OrderSummary({
   provider,
@@ -58,23 +57,15 @@ export function OrderSummary({
   currency = "IDR",
 }: OrderSummaryProps) {
   return (
-    <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-8 backdrop-blur-[24px]">
+    <div className="rounded-2xl border border-line bg-surface/50 p-6 backdrop-blur sm:p-8">
       {/* Header */}
-      <div className="mb-6 flex items-center gap-2">
-        <svg
-          className="h-5 w-5 text-[#FFBF00]"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={1.5}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"
-          />
-        </svg>
-        <h2 className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/60">
+      <div className="mb-6 flex items-center gap-2.5">
+        <div className="grid h-8 w-8 place-items-center rounded-lg border border-line/80 bg-surface-2">
+          <span className="material-symbols-outlined text-[16px] text-accent">
+            receipt_long
+          </span>
+        </div>
+        <h2 className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-fg-dim">
           Ringkasan Order
         </h2>
       </div>
@@ -84,62 +75,40 @@ export function OrderSummary({
         {items.map((item, idx) => (
           <div key={idx}>
             {/* Product name */}
-            <h3 className="text-lg font-semibold text-[#F5F5F0]">
+            <h3 className="text-[18px] font-bold text-fg">
               {item.product_name}
             </h3>
 
-            {/* Provider badge */}
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-1.5 rounded-full border border-[rgba(255,191,0,0.10)] bg-[rgba(25,20,0,0.5)] px-3 py-1 text-xs text-[#F5F5F0]/70 backdrop-blur-[12px]">
+            {/* Meta badges */}
+            <div className="mt-2.5 flex flex-wrap items-center gap-2">
+              {/* Provider */}
+              <div className="flex items-center gap-1.5 rounded-md border border-line/80 bg-surface/50 px-2.5 py-1 text-[11px] text-fg-muted">
                 {provider.verified && (
-                  <svg
-                    className="h-3 w-3 text-[#FFBF00]"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  <span className="material-symbols-outlined text-[13px] text-accent">
+                    verified
+                  </span>
                 )}
                 <span>{provider.name}</span>
               </div>
 
               {/* Billing cycle */}
-              <span className="rounded-full border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.3)] px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] text-[#F5F5F0]/50">
+              <span className="rounded-md border border-line/60 bg-surface/30 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-dim">
                 {formatBillingCycle(item.billing_cycle)}
               </span>
 
               {/* Region */}
               {item.region && (
-                <span className="flex items-center gap-1 text-xs text-[#F5F5F0]/40">
-                  <svg
-                    className="h-3 w-3"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
-                    />
-                  </svg>
+                <span className="flex items-center gap-1 text-[11px] text-fg-dim">
+                  <span className="material-symbols-outlined text-[13px]">
+                    location_on
+                  </span>
                   {item.region}
                 </span>
               )}
 
               {/* Provisioning SLA */}
               {item.provisioning_sla && (
-                <span className="rounded-full border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.3)] px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] text-[#FFBF00]/50">
+                <span className="rounded-md border border-accent/20 bg-accent/5 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-accent/70">
                   SLA {item.provisioning_sla}
                 </span>
               )}
@@ -153,12 +122,12 @@ export function OrderSummary({
                   .map(([key, val]) => (
                     <div
                       key={key}
-                      className="rounded-lg border border-[rgba(255,191,0,0.06)] bg-[rgba(25,20,0,0.3)] px-3 py-2"
+                      className="rounded-lg border border-line/60 bg-surface-2 px-3 py-2"
                     >
-                      <p className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/50">
+                      <p className="font-mono text-[9px] font-medium uppercase tracking-[0.16em] text-fg-dim">
                         {specLabels[key] ?? key}
                       </p>
-                      <p className="text-sm font-medium text-[#F5F5F0]">
+                      <p className="mt-0.5 text-[13px] font-semibold text-fg">
                         {String(val)}
                       </p>
                     </div>
@@ -167,11 +136,11 @@ export function OrderSummary({
             )}
 
             {/* Item price */}
-            <div className="mt-3 flex items-center justify-between text-sm">
-              <span className="text-[#F5F5F0]/40">
+            <div className="mt-3 flex items-center justify-between font-mono text-[12px]">
+              <span className="text-fg-dim">
                 {formatPrice(item.unit_price, currency)} &times; {item.quantity}
               </span>
-              <span className="font-medium text-[#F5F5F0]">
+              <span className="font-semibold text-fg">
                 {formatPrice(item.subtotal, currency)}
               </span>
             </div>
@@ -180,11 +149,11 @@ export function OrderSummary({
       </div>
 
       {/* Total */}
-      <div className="mt-6 flex items-center justify-between border-t border-[rgba(255,191,0,0.08)] pt-4">
-        <span className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/60">
+      <div className="mt-6 flex items-center justify-between border-t border-line pt-5">
+        <span className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-fg-dim">
           Total
         </span>
-        <span className="text-xl font-bold text-[#FFBF00]">
+        <span className="studio-display text-[28px] text-accent">
           {formatPrice(total, currency)}
         </span>
       </div>

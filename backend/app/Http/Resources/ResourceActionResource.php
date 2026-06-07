@@ -24,6 +24,11 @@ class ResourceActionResource extends JsonResource
             'result' => $this->result,
             'processed_by' => $this->processed_by,
             'processed_at' => $this->processed_at?->toIso8601String(),
+            'deployment' => new DeploymentResource($this->whenLoaded('deployment')),
+            'deployment_name' => $this->whenLoaded('deployment', fn () => $this->deployment?->hostname ?? 'N/A'),
+            'user' => new UserResource($this->whenLoaded('user')),
+            'customer_name' => $this->whenLoaded('user', fn () => $this->user?->name ?? 'N/A'),
+            'requested_at' => $this->created_at?->toIso8601String(),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];

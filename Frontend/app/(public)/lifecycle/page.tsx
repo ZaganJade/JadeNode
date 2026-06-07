@@ -557,7 +557,7 @@ export default function LifecyclePage() {
       {/* ───────────────────────── FOOTER ───────────────────────── */}
       <footer className="border-t border-line/70 px-6 py-16">
         <div className="mx-auto max-w-[1320px]">
-          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div className="footer-4col-grid grid gap-10 md:grid-cols-2">
             <div>
               <div className="flex items-center gap-2.5">
                 <span className="relative grid h-7 w-7 place-items-center">

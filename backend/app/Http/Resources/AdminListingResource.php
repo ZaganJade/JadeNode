@@ -21,11 +21,11 @@ class AdminListingResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'region' => $this->region,
-            'specs_summary' => $this->specs_summary,
+            'specs_summary' => is_array($this->specs) ? implode(', ', $this->specs) : $this->specs,
             'availability_status' => $this->availability_status,
             'provisioning_sla_hours' => $this->provisioning_sla_hours,
             'is_active' => $this->is_active,
-            'sort_order' => $this->sort_order,
+            'sort_order' => $this->display_priority,
             'provider' => [
                 'public_id' => $this->whenLoaded('provider')?->public_id,
                 'name' => $this->whenLoaded('provider')?->name,
@@ -35,11 +35,11 @@ class AdminListingResource extends JsonResource
                 'slug' => $this->whenLoaded('category')?->slug,
                 'name' => $this->whenLoaded('category')?->name,
             ],
-            'resource_type' => [
-                'slug' => $this->whenLoaded('resourceType')?->slug,
-                'name' => $this->whenLoaded('resourceType')?->name,
-            ],
-            'prices' => ListingPriceResource::collection($this->whenLoaded('prices')),
+            'resource_type' => $this->resource_type ? [
+                'slug' => $this->resource_type,
+                'name' => ucfirst(str_replace('_', ' ', $this->resource_type)),
+            ] : null,
+            'prices' => AdminListingPriceResource::collection($this->whenLoaded('prices')),
             'last_audit' => $this->when($this->relationLoaded('latestAuditLog') && $this->latestAuditLog, function () {
                 $log = $this->latestAuditLog;
                 return [

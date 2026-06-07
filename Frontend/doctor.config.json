@@ -1,0 +1,11 @@
+{
+  "ignore": {
+    "files": [
+      "**/.next/**",
+      "**/node_modules/**",
+      "**/out/**",
+      "**/build/**",
+      "**/coverage/**"
+    ]
+  }
+}

@@ -12,11 +12,28 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class ResourceActionController
 {
     /**
+     * Admin: List all resource actions across all deployments.
+     */
+    public function adminIndex(Request $request): AnonymousResourceCollection
+    {
+        $actions = ResourceAction::query()
+            ->with(['deployment', 'user']);
+
+        if ($request->filled('status')) {
+            $actions->where('status', $request->input('status'));
+        }
+
+        return ResourceActionResource::collection(
+            $actions->latest()->paginate(15)
+        );
+    }
+
+    /**
      * List actions for a deployment.
      */
-    public function index(Request $request, int $deploymentId): AnonymousResourceCollection
+    public function index(Request $request, string $deploymentId): AnonymousResourceCollection
     {
-        $deployment = Deployment::where('id', $deploymentId)
+        $deployment = Deployment::where('public_id', $deploymentId)
             ->where('user_id', $request->user()->id)
             ->first();
 
@@ -24,7 +41,7 @@ class ResourceActionController
             abort(404, 'Deployment tidak ditemukan.');
         }
 
-        $actions = ResourceAction::where('deployment_id', $deploymentId)
+        $actions = ResourceAction::where('deployment_id', $deployment->id)
             ->latest()
             ->paginate(15);
 

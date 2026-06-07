@@ -22,8 +22,14 @@ class AdminUpdateListingRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'name' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:2000'],
+            'resource_type' => ['nullable', 'string', 'max:100'],
+            'region' => ['nullable', 'string', 'max:100'],
+            'display_priority' => ['nullable', 'integer', 'min:0'],
+            'specs' => ['nullable', 'array'],
             'availability_status' => ['nullable', 'string', 'in:available,limited,waitlist,unavailable'],
-            'provisioning_sla_hours' => ['nullable', 'integer', 'min:1'],
+            'provisioning_sla_hours' => ['nullable', 'integer', 'min:1', 'max:720'],
             'is_active' => ['nullable', 'boolean'],
             'prices' => ['nullable', 'array'],
             'prices.*.billing_cycle' => ['required_with:prices', 'string', 'in:monthly,yearly'],

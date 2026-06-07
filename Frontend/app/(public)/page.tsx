@@ -7,6 +7,7 @@ import { NetworkPaths } from "@/components/landing/studio/network-paths";
 import { NodeCluster } from "@/components/landing/studio/node-cluster";
 import { CatalogExplorer } from "@/components/landing/studio/catalog-explorer";
 import { RegionGlobe } from "@/components/landing/studio/region-globe";
+import { LandingArticles } from "@/components/landing/landing-articles";
 
 const HERO_STATS = [
   { value: "450+", label: "Node aktif" },
@@ -68,8 +69,10 @@ const FOOTER_COLUMNS = [
     items: [
       { text: "Katalog", href: "/marketplace" },
       { text: "Lifecycle", href: "/lifecycle" },
+      { text: "Layanan", href: "/layanan" },
       { text: "Harga", href: "/pricing" },
       { text: "Ajukan akses", href: "#mulai" },
+      { text: "Artikel", href: "/articles" },
     ],
   },
   {
@@ -323,6 +326,33 @@ export default function PublicHomePage() {
           <CatalogExplorer />
         </section>
 
+        {/* ───────────────────────── ARTICLES ───────────────────────── */}
+        <section id="articles" className="mx-auto max-w-[1320px] px-6 py-24">
+          <div className="reveal-rise mb-12 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <Eyebrow>Artikel</Eyebrow>
+              <h2 className="studio-display mt-5 max-w-2xl text-[clamp(30px,4.5vw,56px)] text-fg">
+                Insight, panduan, dan berita terbaru.
+              </h2>
+            </div>
+            <div className="max-w-xs lg:text-right">
+              <Link
+                href="/articles"
+                className="studio-eyebrow inline-flex items-center gap-1.5 text-accent hover:underline"
+              >
+                Lihat semua artikel
+                <span className="material-symbols-outlined text-[14px]">
+                  north_east
+                </span>
+              </Link>
+              <p className="mt-3 text-[13px] leading-relaxed text-fg-muted">
+                Tutorial, pengumuman, dan insight infrastruktur dari tim JadeNode.
+              </p>
+            </div>
+          </div>
+          <LandingArticles />
+        </section>
+
         {/* ───────────────────────── REVIEWS ───────────────────────── */}
         <section className="mx-auto max-w-[1320px] px-6 py-24">
           <div className="reveal-rise mb-12 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
@@ -523,7 +553,7 @@ export default function PublicHomePage() {
       {/* ───────────────────────── FOOTER ───────────────────────── */}
       <footer className="border-t border-line/70 px-6 py-16">
         <div className="mx-auto max-w-[1320px]">
-          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div className="footer-4col-grid grid gap-10 md:grid-cols-2">
             <div>
               <div className="flex items-center gap-2.5">
                 <span className="relative grid h-7 w-7 place-items-center">

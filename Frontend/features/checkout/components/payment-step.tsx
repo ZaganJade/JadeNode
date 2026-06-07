@@ -6,17 +6,11 @@ import { loadMidtransSnap, openMidtransSnap, type SnapResult } from "@/lib/midtr
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 interface PaymentStepProps {
-  /** Snap token from backend POST /v1/orders/{id}/pay */
   snapToken: string;
-  /** Order public ID for redirection */
   orderId: string;
-  /** Called when payment succeeds */
   onSuccess?: (result: SnapResult) => void;
-  /** Called when payment is pending */
   onPending?: (result: SnapResult) => void;
-  /** Called when payment errors */
   onError?: (result: SnapResult) => void;
-  /** Called when user closes popup without paying */
   onClose?: () => void;
 }
 
@@ -25,11 +19,8 @@ type PaymentStatus = "idle" | "loading" | "paying" | "success" | "pending" | "er
 // ─── Component ──────────────────────────────────────────────────────────────
 
 /**
- * Midtrans Snap integration component.
- *
- * Loads snap.js from CDN and opens the Snap popup when the customer
- * clicks the pay button. Handles success/pending/error/close callbacks
- * with appropriate UI state.
+ * Midtrans Snap integration — studio editorial styling.
+ * Dark void background with orange accent, matching the marketplace design system.
  */
 export function PaymentStep({
   snapToken,
@@ -39,12 +30,11 @@ export function PaymentStep({
   onError,
   onClose,
 }: PaymentStepProps) {
-  const [status, setStatus] = useState<PaymentStatus>("idle");
+  const [status, setStatus] = useState<PaymentStatus>("loading");
   const [loadError, setLoadError] = useState<string | null>(null);
 
   // Load Midtrans Snap on mount
   useEffect(() => {
-    setStatus("loading");
     loadMidtransSnap()
       .then(() => setStatus("idle"))
       .catch((err) => {
@@ -83,11 +73,11 @@ export function PaymentStep({
   // ── Loading state
   if (status === "loading") {
     return (
-      <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-8 backdrop-blur-[24px]">
+      <div className="rounded-2xl border border-line bg-surface/50 p-8 backdrop-blur">
         <div className="flex flex-col items-center gap-4 py-8">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#FFBF00]/20 border-t-[#FFBF00]" />
-          <p className="text-sm text-[#F5F5F0]/50">
-            Memuat payment gateway...
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent/20 border-t-accent" />
+          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-fg-dim">
+            Memuat payment gateway…
           </p>
         </div>
       </div>
@@ -97,17 +87,17 @@ export function PaymentStep({
   // ── Success state
   if (status === "success") {
     return (
-      <div className="rounded-2xl border border-success-500/20 bg-success-500/5 p-8 backdrop-blur-[24px]">
-        <div className="flex flex-col items-center gap-4 py-4 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-success-500/10">
-            <svg className="h-8 w-8 text-success-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-            </svg>
+      <div className="rounded-2xl border border-success/20 bg-success/5 p-8 backdrop-blur">
+        <div className="flex flex-col items-center gap-4 py-6 text-center">
+          <div className="grid h-16 w-16 place-items-center rounded-full border border-success/20 bg-success/10">
+            <span className="material-symbols-outlined text-[28px] text-success">
+              check_circle
+            </span>
           </div>
-          <h3 className="text-lg font-semibold text-[#F5F5F0]">
+          <h3 className="studio-display text-[20px] text-fg">
             Pembayaran Berhasil
           </h3>
-          <p className="text-sm text-[#F5F5F0]/50">
+          <p className="text-[13px] text-fg-muted">
             Pembayaran Anda sedang diproses. Anda akan dialihkan ke detail order.
           </p>
         </div>
@@ -118,19 +108,19 @@ export function PaymentStep({
   // ── Pending state
   if (status === "pending") {
     return (
-      <div className="rounded-2xl border border-warning-500/20 bg-warning-500/5 p-8 backdrop-blur-[24px]">
-        <div className="flex flex-col items-center gap-4 py-4 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-warning-500/10">
-            <svg className="h-8 w-8 text-warning-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+      <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-8 backdrop-blur">
+        <div className="flex flex-col items-center gap-4 py-6 text-center">
+          <div className="grid h-16 w-16 place-items-center rounded-full border border-amber-500/20 bg-amber-500/10">
+            <span className="material-symbols-outlined text-[28px] text-amber-400">
+              schedule
+            </span>
           </div>
-          <h3 className="text-lg font-semibold text-[#F5F5F0]">
-            Pembayaran Menunggu Konfirmasi
+          <h3 className="studio-display text-[20px] text-fg">
+            Menunggu Konfirmasi
           </h3>
-          <p className="text-sm text-[#F5F5F0]/50">
-            Pembayaran Anda sedang menunggu konfirmasi dari payment gateway.
-            Silakan cek status order Anda nanti.
+          <p className="text-[13px] text-fg-muted">
+            Pembayaran sedang menunggu konfirmasi dari payment gateway.
+            Cek status order Anda nanti.
           </p>
         </div>
       </div>
@@ -140,17 +130,17 @@ export function PaymentStep({
   // ── Error state (with retry)
   if (status === "error" && loadError) {
     return (
-      <div className="rounded-2xl border border-error-500/20 bg-error-500/5 p-8 backdrop-blur-[24px]">
-        <div className="flex flex-col items-center gap-4 py-4 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-error-500/10">
-            <svg className="h-8 w-8 text-error-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-            </svg>
+      <div className="rounded-2xl border border-error/20 bg-error/5 p-8 backdrop-blur">
+        <div className="flex flex-col items-center gap-4 py-6 text-center">
+          <div className="grid h-16 w-16 place-items-center rounded-full border border-error/20 bg-error/10">
+            <span className="material-symbols-outlined text-[28px] text-error">
+              error
+            </span>
           </div>
-          <h3 className="text-lg font-semibold text-[#F5F5F0]">
+          <h3 className="studio-display text-[20px] text-fg">
             Pembayaran Gagal
           </h3>
-          <p className="text-sm text-[#F5F5F0]/50">{loadError}</p>
+          <p className="text-[13px] text-fg-muted">{loadError}</p>
           <button
             type="button"
             onClick={() => {
@@ -163,7 +153,7 @@ export function PaymentStep({
                   setStatus("error");
                 });
             }}
-            className="mt-2 rounded-full border border-[rgba(255,191,0,0.12)] bg-[rgba(25,20,0,0.6)] px-6 py-2.5 text-sm font-medium text-[#F5F5F0]/60 transition-colors hover:border-[rgba(255,191,0,0.3)] hover:text-[#F5F5F0]"
+            className="mt-2 rounded-lg border border-line px-5 py-2.5 text-[13px] font-semibold text-fg-muted transition-all hover:border-accent hover:text-accent"
           >
             Coba Lagi
           </button>
@@ -174,30 +164,29 @@ export function PaymentStep({
 
   // ── Idle / ready to pay
   return (
-    <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-8 backdrop-blur-[24px]">
+    <div className="rounded-2xl border border-line bg-surface/50 p-8 backdrop-blur">
       <div className="flex flex-col items-center gap-6 py-4">
         {/* Payment icon */}
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[rgba(255,191,0,0.08)]">
-          <svg
-            className="h-8 w-8 text-[#FFBF00]"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={1.5}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"
-            />
-          </svg>
+        <div className="relative grid h-16 w-16 place-items-center">
+          <div
+            className="absolute inset-0 rounded-full"
+            style={{
+              background:
+                "radial-gradient(50% 50% at 50% 50%, rgba(255,116,0,0.12), transparent 70%)",
+            }}
+          />
+          <div className="relative grid h-14 w-14 place-items-center rounded-full border border-accent/20 bg-accent/5">
+            <span className="material-symbols-outlined text-[28px] text-accent">
+              credit_card
+            </span>
+          </div>
         </div>
 
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-[#F5F5F0]">
+          <h3 className="studio-display text-[20px] text-fg">
             Bayar via Midtrans Snap
           </h3>
-          <p className="mt-1 text-sm text-[#F5F5F0]/50">
+          <p className="mt-2 text-[13px] text-fg-muted">
             Klik tombol di bawah untuk membuka halaman pembayaran yang aman.
           </p>
         </div>
@@ -206,20 +195,25 @@ export function PaymentStep({
           type="button"
           onClick={handlePay}
           disabled={status === "paying"}
-          className="inline-flex items-center rounded-full bg-[#FFBF00] px-8 py-3 text-sm font-semibold text-[#0D0B00] shadow-[0_0_20px_rgba(255,191,0,0.25)] transition-all hover:shadow-[0_0_30px_rgba(255,191,0,0.4)] disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-lg border border-line-strong px-8 py-3 text-[13px] font-semibold text-fg transition-all hover:border-accent hover:bg-accent hover:text-accent-fg disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-line-strong disabled:hover:bg-transparent disabled:hover:text-fg"
         >
           {status === "paying" ? (
             <>
-              <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-[#0D0B00]/20 border-t-[#0D0B00]" />
-              Membuka Pembayaran...
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-fg/20 border-t-fg" />
+              Membuka Pembayaran…
             </>
           ) : (
-            "Bayar Sekarang"
+            <>
+              <span className="material-symbols-outlined text-[16px]">
+                lock
+              </span>
+              Bayar Sekarang
+            </>
           )}
         </button>
 
-        <p className="text-center text-xs text-[#F5F5F0]/30">
-          Anda akan diarahkan ke halaman pembayaran Midtrans yang aman.
+        <p className="text-center font-mono text-[10px] uppercase tracking-[0.14em] text-fg-dim">
+          Diarahkan ke Midtrans · Pembayaran aman terenkripsi
         </p>
       </div>
     </div>

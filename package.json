@@ -8,7 +8,8 @@
     "test": "echo \"Test scripts will be wired after backend/frontend scaffolding.\"",
     "typecheck": "echo \"Frontend typecheck will be wired after Next.js scaffolding.\"",
     "lint": "echo \"Lint scripts will be wired after app scaffolding.\"",
-    "build": "echo \"Build scripts will be wired after app scaffolding.\""
+    "build": "echo \"Build scripts will be wired after app scaffolding.\"",
+    "doctor": "npx react-doctor@latest"
   },
   "workspaces": [
     "frontend",
@@ -16,5 +17,8 @@
   ],
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "react-doctor": "^0.2.16"
   }
 }

@@ -1,8 +1,7 @@
 {
-  "/api/marketplace/listings/route": "app/api/marketplace/listings/route.js",
-  "/(public)/lifecycle/page": "app/(public)/lifecycle/page.js",
+  "/(public)/articles/page": "app/(public)/articles/page.js",
+  "/(public)/page": "app/(public)/page.js",
   "/(public)/marketplace/page": "app/(public)/marketplace/page.js",
-  "/(auth)/login/page": "app/(auth)/login/page.js",
-  "/(public)/docs/page": "app/(public)/docs/page.js",
-  "/(auth)/register/page": "app/(auth)/register/page.js"
+  "/(public)/layanan/page": "app/(public)/layanan/page.js",
+  "/(public)/lifecycle/page": "app/(public)/lifecycle/page.js"
 }

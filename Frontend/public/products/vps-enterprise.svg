@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <defs>
+    <radialGradient id="bg-vps-enterprise.png" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1a1600"/>
+      <stop offset="100%" stop-color="#0d0a00"/>
+    </radialGradient>
+    <radialGradient id="glow-vps-enterprise.png" cx="50%" cy="45%" r="40%">
+      <stop offset="0%" stop-color="#FFBF00" stop-opacity="0.25"/>
+      <stop offset="60%" stop-color="#FFBF00" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#FFBF00" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur-vps-enterprise.png">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2"/>
+    </filter>
+    <linearGradient id="accent-line-vps-enterprise.png" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFBF00" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#FFBF00" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#FFBF00" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="icon-fill-vps-enterprise.png" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFBF00" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#FFBF00" stop-opacity="0.5"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="600" fill="url(#bg-vps-enterprise.png)"/>
+  
+  <!-- Glow -->
+  <rect width="600" height="600" fill="url(#glow-vps-enterprise.png)"/>
+
+  <!-- Grid pattern (subtle) -->
+  <g stroke="#FFBF00" stroke-opacity="0.04" stroke-width="0.5">
+    <line x1="0" y1="0" x2="0" y2="600"/>
+    <line x1="50" y1="0" x2="50" y2="600"/>
+    <line x1="100" y1="0" x2="100" y2="600"/>
+    <line x1="150" y1="0" x2="150" y2="600"/>
+    <line x1="200" y1="0" x2="200" y2="600"/>
+    <line x1="250" y1="0" x2="250" y2="600"/>
+    <line x1="300" y1="0" x2="300" y2="600"/>
+    <line x1="350" y1="0" x2="350" y2="600"/>
+    <line x1="400" y1="0" x2="400" y2="600"/>
+    <line x1="450" y1="0" x2="450" y2="600"/>
+    <line x1="500" y1="0" x2="500" y2="600"/>
+    <line x1="550" y1="0" x2="550" y2="600"/>
+    <line x1="600" y1="0" x2="600" y2="600"/>
+    <line x1="0" y1="0" x2="600" y2="0"/>
+    <line x1="0" y1="50" x2="600" y2="50"/>
+    <line x1="0" y1="100" x2="600" y2="100"/>
+    <line x1="0" y1="150" x2="600" y2="150"/>
+    <line x1="0" y1="200" x2="600" y2="200"/>
+    <line x1="0" y1="250" x2="600" y2="250"/>
+    <line x1="0" y1="300" x2="600" y2="300"/>
+    <line x1="0" y1="350" x2="600" y2="350"/>
+    <line x1="0" y1="400" x2="600" y2="400"/>
+    <line x1="0" y1="450" x2="600" y2="450"/>
+    <line x1="0" y1="500" x2="600" y2="500"/>
+    <line x1="0" y1="550" x2="600" y2="550"/>
+    <line x1="0" y1="600" x2="600" y2="600"/>
+  </g>
+
+  <!-- Circuit lines -->
+  
+    <path d="M70,70 L70,160 L160,160 L160,100" fill="none" stroke="#FFBF00" stroke-opacity="0.06" stroke-width="1"/>
+    <path d="M530,70 L530,180 L440,180" fill="none" stroke="#FFBF00" stroke-opacity="0.06" stroke-width="1"/>
+    <path d="M100,530 L200,530 L200,460" fill="none" stroke="#FFBF00" stroke-opacity="0.06" stroke-width="1"/>
+    <circle cx="160" cy="100" r="3" fill="#FFBF00" opacity="0.1"/>
+    <circle cx="440" cy="180" r="3" fill="#FFBF00" opacity="0.1"/>
+    <circle cx="200" cy="460" r="3" fill="#FFBF00" opacity="0.08"/>
+  
+
+  <!-- Central icon -->
+  <g transform="translate(300, 260)" fill="none" stroke="url(#icon-fill-vps-enterprise.png)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    
+    <polygon points="0,-38 33,-19 33,19 0,38 -33,19 -33,-19" stroke-width="2.5" fill="none"/>
+    <polygon points="0,-22 18,-11 18,11 0,22 -18,11 -18,-11" stroke-width="1.5" fill="none" opacity="0.5"/>
+    <circle cx="0" cy="0" r="5" fill="#FFBF00" opacity="0.3"/>
+    <line x1="0" y1="-38" x2="0" y2="-48" stroke-width="1" opacity="0.4"/>
+    <line x1="33" y1="-19" x2="42" y2="-24" stroke-width="1" opacity="0.4"/>
+    <line x1="33" y1="19" x2="42" y2="24" stroke-width="1" opacity="0.4"/>
+    <line x1="0" y1="38" x2="0" y2="48" stroke-width="1" opacity="0.4"/>
+    <line x1="-33" y1="19" x2="-42" y2="24" stroke-width="1" opacity="0.4"/>
+    <line x1="-33" y1="-19" x2="-42" y2="-24" stroke-width="1" opacity="0.4"/>
+  
+  </g>
+
+  <!-- Glow behind icon -->
+  <circle cx="300" cy="260" r="60" fill="#FFBF00" opacity="0.06" filter="url(#blur-vps-enterprise.png)"/>
+
+  <!-- Title -->
+  <text x="300" y="420" text-anchor="middle" font-family="monospace" font-size="28" font-weight="bold" fill="white" opacity="0.95">VPS Enterprise</text>
+  
+  <!-- Subtitle -->
+  <text x="300" y="450" text-anchor="middle" font-family="monospace" font-size="14" fill="#FFBF00" opacity="0.7" letter-spacing="4">8 VCPU · 16GB</text>
+
+  <!-- Bottom accent line -->
+  <line x1="200" y1="480" x2="400" y2="480" stroke="url(#accent-line-vps-enterprise.png)" stroke-width="1.5"/>
+
+  <!-- Corner accents -->
+  <polyline points="20,50 20,20 50,20" fill="none" stroke="#FFBF00" stroke-opacity="0.3" stroke-width="1.5"/>
+  <polyline points="550,20 580,20 580,50" fill="none" stroke="#FFBF00" stroke-opacity="0.3" stroke-width="1.5"/>
+  <polyline points="20,550 20,580 50,580" fill="none" stroke="#FFBF00" stroke-opacity="0.3" stroke-width="1.5"/>
+  <polyline points="550,580 580,580 580,550" fill="none" stroke="#FFBF00" stroke-opacity="0.3" stroke-width="1.5"/>
+</svg>
