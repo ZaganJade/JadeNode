@@ -1,7 +1,0 @@
-{
-  "/(public)/articles/page": "app/(public)/articles/page.js",
-  "/(public)/page": "app/(public)/page.js",
-  "/(public)/marketplace/page": "app/(public)/marketplace/page.js",
-  "/(public)/layanan/page": "app/(public)/layanan/page.js",
-  "/(public)/lifecycle/page": "app/(public)/lifecycle/page.js"
-}
