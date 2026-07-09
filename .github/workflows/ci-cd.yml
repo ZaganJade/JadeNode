@@ -89,7 +89,7 @@ jobs:
           QUEUE_CONNECTION: sync
       - name: Run tests
         working-directory: backend
-        run: php artisan test
+        run: ./vendor/bin/phpunit
         env:
           APP_ENV: testing
           DB_CONNECTION: pgsql
