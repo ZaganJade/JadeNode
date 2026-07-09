@@ -8,27 +8,20 @@ use App\Modules\Auth\Models\BetaAccessRequest;
 use App\Notifications\BetaAccessDecisionNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class AdminBetaAccessController
 {
     /**
      * List pending beta access requests with user info.
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
         $requests = BetaAccessRequest::with(['user', 'reviewer'])
             ->orderByDesc('created_at')
             ->paginate($request->input('per_page', 15));
 
-        return response()->json([
-            'data' => BetaAccessRequestResource::collection($requests),
-            'meta' => [
-                'current_page' => $requests->currentPage(),
-                'last_page' => $requests->lastPage(),
-                'per_page' => $requests->perPage(),
-                'total' => $requests->total(),
-            ],
-        ]);
+        return BetaAccessRequestResource::collection($requests);
     }
 
     /**

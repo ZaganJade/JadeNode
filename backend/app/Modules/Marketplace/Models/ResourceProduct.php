@@ -10,6 +10,14 @@ class ResourceProduct extends Model
 {
     use HasFactory, SoftDeletes;
 
+    /**
+     * Resolve the factory from the flat Database\Factories namespace.
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\ResourceProductFactory::new();
+    }
+
     protected $fillable = [
         'public_id',
         'provider_id',

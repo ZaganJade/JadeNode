@@ -54,10 +54,10 @@ export function StudioNav() {
             : "border-transparent bg-transparent"
         }`}
       >
-        <div className="mx-auto flex h-16 max-w-[1320px] items-center gap-4 px-6">
+        <div className="mx-auto flex h-16 max-w-[1320px] items-center gap-5 px-6">
           {/* Brand */}
-          <Link href="/" className="flex items-center gap-2.5">
-            <span className="relative grid h-7 w-7 place-items-center">
+          <Link href="/" className="flex shrink-0 items-center gap-2.5">
+            <span className="relative grid h-7 w-7 shrink-0 place-items-center overflow-hidden">
               <span
                 className="absolute inset-0 bg-accent"
                 style={{
@@ -69,12 +69,12 @@ export function StudioNav() {
                 JN
               </span>
             </span>
-            <span className="studio-display text-[16px] font-bold tracking-tight text-fg">
+            <span className="studio-display shrink-0 text-[16px] font-bold tracking-tight text-fg">
               Jade<span className="text-accent">Node</span>
             </span>
           </Link>
 
-          <nav className="ml-3 hidden items-center gap-6 lg:flex">
+          <nav className="hidden items-center gap-6 lg:flex">
             {PRIMARY.map((l) => (
               <Link
                 key={l.label}
@@ -86,8 +86,11 @@ export function StudioNav() {
             ))}
           </nav>
 
+          {/* Spacer — pushes search + actions to the right */}
+          <div className="hidden flex-1 lg:block" />
+
           {/* Search (visual) */}
-          <div className="ml-auto hidden min-w-0 flex-1 justify-center md:flex">
+          <div className="hidden min-w-0 md:flex">
             <div className="flex h-9 w-full max-w-[300px] items-center gap-2 rounded-md border border-line bg-surface/80 px-3 text-fg-dim">
               <span className="material-symbols-outlined text-[16px]">
                 search
@@ -101,7 +104,7 @@ export function StudioNav() {
             </div>
           </div>
 
-          <div className="ml-auto flex items-center gap-3 md:ml-0">
+          <div className="ml-auto flex shrink-0 items-center gap-3 md:ml-3">
             <Link
               href="/docs"
               className="hidden text-[13px] text-fg-muted transition-colors hover:text-fg lg:inline"

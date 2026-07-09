@@ -9,7 +9,7 @@ import { ScrollRail } from "@/components/landing/studio/scroll-rail";
 import { api, ApiException } from "@/lib/api";
 import { formatPrice } from "@/lib/formatters";
 import { OrderSummary } from "@/features/checkout/components/order-summary";
-import { PaymentStep } from "@/features/checkout/components/payment-step";
+import { DemoPayment } from "@/features/checkout/components/demo-payment";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -59,11 +59,6 @@ interface OrderData {
     subtotal: number;
   }>;
   provider: Provider;
-}
-
-interface PayResponse {
-  snap_token: string;
-  redirect_url?: string;
 }
 
 type CheckoutStep = "review" | "payment" | "success";
@@ -171,7 +166,7 @@ export default function CheckoutPage() {
   const [selectedCycle, setSelectedCycle] = useState<string | null>(null);
   const [step, setStep] = useState<CheckoutStep>("review");
   const [order, setOrder] = useState<OrderData | null>(null);
-  const [snapToken, setSnapToken] = useState<string | null>(null);
+  const [showPayment, setShowPayment] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -265,10 +260,8 @@ export default function CheckoutPage() {
       });
       setOrder(orderData);
 
-      const payData = await api.post<PayResponse>(
-        `/api/v1/orders/${orderData.public_id}/pay`,
-      );
-      setSnapToken(payData.snap_token);
+      // Demo: skip real payment gateway, show demo payment UI
+      setShowPayment(true);
       setStep("payment");
     } catch (err) {
       orderCreatedRef.current = false;
@@ -692,14 +685,13 @@ export default function CheckoutPage() {
           )}
 
           {/* Payment step */}
-          {step === "payment" && snapToken && (
-            <PaymentStep
-              snapToken={snapToken}
+          {step === "payment" && (
+            <DemoPayment
               orderId={order?.public_id ?? ""}
+              total={order?.total ?? totalPrice}
               onSuccess={handlePaymentSuccess}
               onPending={handlePaymentPending}
               onError={() => {}}
-              onClose={() => {}}
             />
           )}
         </RevealOnScroll>
@@ -708,7 +700,7 @@ export default function CheckoutPage() {
         <div className="mt-10 border-t border-line pt-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-dim">
-              © 2026 JadeNode · Pembayaran via Midtrans Snap
+              © 2026 JadeNode · Demo Payment Gateway
             </p>
             <div className="flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-success pulse-dot" />

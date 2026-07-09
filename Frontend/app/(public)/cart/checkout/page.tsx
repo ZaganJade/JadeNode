@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { StudioNav } from "@/components/landing/studio/studio-nav";
 import { ScrollRail } from "@/components/landing/studio/scroll-rail";
-import { PaymentStep } from "@/features/checkout/components/payment-step";
+import { DemoPayment } from "@/features/checkout/components/demo-payment";
 import { api, ApiException } from "@/lib/api";
 import { formatPrice, formatBillingCycle } from "@/lib/formatters";
 import { useCart, unitPrice } from "@/lib/cart";
@@ -105,7 +105,7 @@ export default function CartCheckoutPage() {
   });
   const [step, setStep] = useState<Step>("review");
   const [order, setOrder] = useState<CreatedOrder | null>(null);
-  const [snapToken, setSnapToken] = useState<string | null>(null);
+  const [showPayment, setShowPayment] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const idempotencyKey = useRef<string>(
@@ -189,11 +189,8 @@ export default function CartCheckoutPage() {
       const created = { id: res.order.id, public_id: res.order.public_id };
       setOrder(created);
 
-      const payRes = await api.post<{
-        data: { snap_token: string; redirect_url?: string };
-      }>(`/api/v1/orders/${created.id}/pay`);
-
-      setSnapToken(payRes.data.snap_token);
+      // Demo: skip real payment gateway, show demo payment UI
+      setShowPayment(true);
       setStep("payment");
     } catch (err) {
       setError(
@@ -512,20 +509,19 @@ export default function CartCheckoutPage() {
         </div>
       )}
 
-      {step === "payment" && snapToken && (
-        <PaymentStep
-          snapToken={snapToken}
+      {step === "payment" && (
+        <DemoPayment
           orderId={order?.public_id ?? ""}
+          total={subtotal}
           onSuccess={handlePaymentSuccess}
           onPending={handlePaymentPending}
           onError={() => {}}
-          onClose={() => {}}
         />
       )}
 
       <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-6">
         <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-dim">
-          © 2026 JadeNode · Pembayaran via Midtrans Snap
+          © 2026 JadeNode · Demo Payment Gateway
         </p>
         <span className="flex items-center gap-1.5">
           <span className="pulse-dot h-1.5 w-1.5 rounded-full bg-success" />

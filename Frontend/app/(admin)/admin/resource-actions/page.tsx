@@ -97,7 +97,7 @@ export default function AdminResourceActionsPage() {
                     const sc = STATUS_COLORS[action.status];
                     return (
                       <tr key={action.public_id} className="transition-colors hover:bg-white/[0.02]">
-                        <td className="px-4 py-3"><div className="text-[12px] font-medium text-[var(--color-fg)]">{action.deployment_name}</div><div className="font-mono text-[10px] text-[var(--color-fg-dim)]">{action.deployment_id.slice(0, 12)}...</div></td>
+                        <td className="px-4 py-3"><div className="text-[12px] font-medium text-[var(--color-fg)]">{action.deployment_name}</div><div className="font-mono text-[10px] text-[var(--color-fg-dim)]">{String(action.deployment_id).slice(0, 12)}...</div></td>
                         <td className="px-4 py-3 text-[12px] text-[var(--color-fg-muted)]">{action.customer_name}</td>
                         <td className="px-4 py-3"><span className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-line)] bg-black/40 px-2.5 py-1 text-[10px] font-mono font-medium text-[var(--color-fg-muted)]"><span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: '"FILL" 0, "wght" 300' }}>{ACTION_ICONS[action.action_type]}</span>{ACTION_LABELS[action.action_type]}</span></td>
                         <td className="px-4 py-3"><span className="rounded-full border px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider" style={{ color: sc.color, backgroundColor: sc.bg, borderColor: sc.border }}>{action.status}</span></td>

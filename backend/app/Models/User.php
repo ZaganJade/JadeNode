@@ -26,6 +26,7 @@ class User extends Authenticatable
         'country',
         'timezone',
         'public_id',
+        'suspended_at',
     ];
 
     /**
@@ -49,7 +50,24 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'suspended_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Whether the user is currently suspended.
+     */
+    public function isSuspended(): bool
+    {
+        return $this->suspended_at !== null;
+    }
+
+    /**
+     * Scope to only active (non-suspended) users.
+     */
+    public function scopeNotSuspended($query)
+    {
+        return $query->whereNull('suspended_at');
     }
 
     /**
@@ -58,5 +76,13 @@ class User extends Authenticatable
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new VerifyEmailNotification());
+    }
+
+    /**
+     * Whether the user holds an operational admin role.
+     */
+    public function isAdmin(): bool
+    {
+        return in_array($this->role, ['admin', 'super_admin']);
     }
 }

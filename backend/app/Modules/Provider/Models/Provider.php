@@ -10,6 +10,14 @@ class Provider extends Model
 {
     use HasFactory, SoftDeletes;
 
+    /**
+     * Resolve the factory from the flat Database\Factories namespace.
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\ProviderFactory::new();
+    }
+
     protected $fillable = [
         'public_id',
         'name',

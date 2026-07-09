@@ -89,7 +89,7 @@ packages/shared/api-client/generated/
 *.pfx
 
 # Planning
-docs
+/docs
 bmad
 .playwright-mcp
 .github
@@ -97,4 +97,5 @@ bmad
 context.md
 design.md
 progress.md
+.agents
 

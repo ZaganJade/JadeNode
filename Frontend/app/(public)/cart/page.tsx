@@ -161,7 +161,7 @@ export default function CartPage() {
                   <span className="material-symbols-outlined text-[14px] text-success">
                     verified_user
                   </span>
-                  Pembayaran aman via Midtrans Snap
+                  Pembayaran aman · Demo Mode
                 </p>
               </div>
             </aside>

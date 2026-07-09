@@ -14,6 +14,14 @@ class Order extends Model
 {
     use HasFactory, SoftDeletes;
 
+    /**
+     * Resolve the factory from the flat Database\Factories namespace,
+     * since this model lives in a Modules sub-namespace.
+     */    protected static function newFactory()
+    {
+        return \Database\Factories\OrderFactory::new();
+    }
+
     protected $fillable = [
         'public_id',
         'user_id',

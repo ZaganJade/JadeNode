@@ -12,6 +12,14 @@ class Invoice extends Model
 {
     use HasFactory;
 
+    /**
+     * Resolve the factory from the flat Database\Factories namespace.
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\InvoiceFactory::new();
+    }
+
     protected $fillable = [
         'public_id',
         'order_id',

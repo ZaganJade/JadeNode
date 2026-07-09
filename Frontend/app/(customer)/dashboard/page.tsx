@@ -1,738 +1,374 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+
 import Link from "next/link";
 import { getSession, type Session } from "@/lib/auth";
 import { RevealOnScroll } from "@/components/landing/reveal-on-scroll";
-import { cn } from "@/lib/utils";
 
 /* ═══════════════════════════════════════════════════════════════════════
-   SVG CHART COMPONENTS — same rendering engine as admin, but with
-   customer-specific data and palette.
+   HELPERS
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* ── Animated Spending Area Chart ──────────────────────────────────── */
-function SpendingChart() {
-  const [drawn, setDrawn] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!ref.current) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setDrawn(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.3 },
-    );
-    io.observe(ref.current);
-    return () => io.disconnect();
-  }, []);
-
-  const points = [
-    { x: 0, y: 80 },
-    { x: 60, y: 65 },
-    { x: 120, y: 72 },
-    { x: 180, y: 55 },
-    { x: 240, y: 60 },
-    { x: 300, y: 45 },
-    { x: 360, y: 50 },
-    { x: 420, y: 38 },
-    { x: 480, y: 42 },
-    { x: 540, y: 30 },
-    { x: 600, y: 35 },
-    { x: 660, y: 15 },
-  ];
-  const w = 660;
-  const h = 140;
-  const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
-  const areaD = `${pathD} L ${w} ${h} L 0 ${h} Z`;
-
-  return (
-    <div ref={ref} className="w-full">
-      <svg viewBox={`0 0 ${w + 20} ${h + 20}`} className="w-full" style={{ overflow: "visible" }}>
-        <defs>
-          <linearGradient id="custAreaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--color-accent)" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="var(--color-accent)" stopOpacity="0.0" />
-          </linearGradient>
-          <linearGradient id="custLineGrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="var(--color-accent)" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="var(--color-accent)" stopOpacity="1" />
-          </linearGradient>
-        </defs>
-        {[0, 35, 70, 105, 140].map((gy) => (
-          <line key={gy} x1="0" y1={gy} x2={w} y2={gy} stroke="var(--color-line)" strokeWidth="0.5" />
-        ))}
-        <path d={areaD} fill="url(#custAreaGrad)" style={{ opacity: drawn ? 1 : 0, transition: "opacity 1.2s cubic-bezier(0.22,1,0.36,1)" }} />
-        <path d={pathD} fill="none" stroke="url(#custLineGrad)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray={drawn ? "none" : "1000"} strokeDashoffset={drawn ? "0" : "1000"} style={{ transition: "stroke-dasharray 2s cubic-bezier(0.22,1,0.36,1), stroke-dashoffset 2s cubic-bezier(0.22,1,0.36,1)" }} />
-        {points.map((p, i) => (
-          <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="var(--color-accent)" style={{ opacity: drawn ? 1 : 0, transition: `opacity 0.4s cubic-bezier(0.22,1,0.36,1) ${0.8 + i * 0.05}s` }} />
-        ))}
-        <circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r="5" fill="var(--color-accent)" opacity="0.2" className="pulse-dot" />
-      </svg>
-    </div>
-  );
-}
-
-/* ── Donut Chart ───────────────────────────────────────────────────── */
-function DonutChart({
-  data,
-  size = 130,
-  strokeWidth = 24,
+function MIcon({
+  name,
+  size = 18,
+  color,
+  className = "",
 }: {
-  data: { label: string; value: number; color: string }[];
+  name: string;
   size?: number;
-  strokeWidth?: number;
-}) {
-  const [drawn, setDrawn] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const r = (size - strokeWidth) / 2;
-  const circ = 2 * Math.PI * r;
-  const total = data.reduce((s, d) => s + d.value, 0);
-
-  useEffect(() => {
-    if (!ref.current) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) { setDrawn(true); io.disconnect(); }
-      },
-      { threshold: 0.3 },
-    );
-    io.observe(ref.current);
-    return () => io.disconnect();
-  }, []);
-
-  let offset = 0;
-  return (
-    <div ref={ref} className="flex flex-col items-center gap-3">
-      <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--color-line)" strokeWidth={strokeWidth} />
-        {data.map((seg, i) => {
-          const len = (seg.value / total) * circ;
-          offset += len;
-          return (
-            <circle
-              key={seg.label}
-              cx={size / 2} cy={size / 2} r={r}
-              fill="none" stroke={seg.color} strokeWidth={strokeWidth}
-              strokeDasharray={drawn ? `${len} ${circ - len}` : `0 ${circ}`}
-              strokeDashoffset={-(offset - len)}
-              strokeLinecap="butt"
-              style={{ transition: `stroke-dasharray 1.2s cubic-bezier(0.22,1,0.36,1) ${i * 0.15}s` }}
-            />
-          );
-        })}
-      </svg>
-      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1">
-        {data.map((seg) => (
-          <div key={seg.label} className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full" style={{ background: seg.color }} />
-            <span className="text-[10px] text-[var(--color-fg-muted)]">{seg.label}</span>
-            <span className="font-mono text-[10px] font-semibold text-[var(--color-fg)]">
-              {Math.round((seg.value / total) * 100)}%
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ── Mini Sparkline (Uptime) ────────────────────────────────────────── */
-function Sparkline() {
-  const [drawn, setDrawn] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!ref.current) return;
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setDrawn(true); io.disconnect(); } }, { threshold: 0.5 });
-    io.observe(ref.current);
-    return () => io.disconnect();
-  }, []);
-
-  const pts = Array.from({ length: 30 }, (_, i) => ({
-    x: i * 14,
-    y: 18 + Math.sin(i * 0.5) * 3 + (i === 7 || i === 22 ? -4 : 0),
-  }));
-  const d = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
-
-  return (
-    <div ref={ref}>
-      <svg width={420} height={30} className="w-full">
-        <path d={d} fill="none" stroke="var(--color-success)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-          strokeDasharray={drawn ? "none" : "600"} strokeDashoffset={drawn ? "0" : "600"}
-          style={{ transition: "stroke-dasharray 2s cubic-bezier(0.22,1,0.36,1)" }} />
-      </svg>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   KPI CARD
-   ═══════════════════════════════════════════════════════════════════════ */
-
-function KPICard({
-  label,
-  value,
-  sub,
-  icon,
-  trend,
-  delay,
-}: {
-  label: string;
-  value: string;
-  sub: string;
-  icon: string;
-  trend?: "up" | "down" | "neutral";
-  delay: number;
+  color?: string;
+  className?: string;
 }) {
   return (
-    <div
-      className="studio-card reveal-rise rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)]/50 p-5"
-      style={{ transitionDelay: `${delay}ms` }}
+    <span
+      className={`material-symbols-outlined ${className}`}
+      style={{
+        fontSize: size,
+        color,
+        fontVariationSettings: '"FILL" 0, "wght" 300, "GRAD" 0, "opsz" 20',
+      }}
     >
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="studio-eyebrow text-[8px] text-[var(--color-fg-dim)]">{label}</p>
-          <p className="studio-display mt-2 text-[28px] text-[var(--color-fg)]">{value}</p>
-          <p className="mt-1 text-[11px] text-[var(--color-fg-muted)]">{sub}</p>
-        </div>
-        <div className="grid h-10 w-10 place-items-center rounded-xl border border-[var(--color-line)] bg-black/40">
-          <span
-            className="material-symbols-outlined text-[20px] text-[var(--color-accent)]"
-            style={{ fontVariationSettings: '"FILL" 0, "wght" 300, "GRAD" 0, "opsz" 20' }}
-          >
-            {icon}
-          </span>
-        </div>
-      </div>
-      {trend && (
-        <div className="mt-3 flex items-center gap-1.5 border-t border-[var(--color-line)]/80 pt-3">
-          <span
-            className={cn(
-              "material-symbols-outlined text-[14px]",
-              trend === "up" ? "text-[var(--color-success)]" : trend === "down" ? "text-[var(--color-error)]" : "text-[var(--color-fg-dim)]",
-            )}
-            style={{ fontVariationSettings: '"FILL" 0, "wght" 400, "GRAD" 0, "opsz" 20' }}
-          >
-            {trend === "up" ? "trending_up" : trend === "down" ? "trending_down" : "trending_flat"}
-          </span>
-          <span className="text-[10px] text-[var(--color-fg-muted)]">
-            {trend === "up" ? "+8.2%" : trend === "down" ? "-2.1%" : "stabil"} vs bulan lalu
-          </span>
-        </div>
-      )}
-    </div>
+      {name}
+    </span>
   );
 }
 
+function daysUntil(dateStr: string): number {
+  const target = new Date(dateStr).getTime();
+  const now = Date.now();
+  return Math.max(0, Math.ceil((target - now) / 86400000));
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
-   SERVICE CARD — deployment status row
+   SERVICE ROW
    ═══════════════════════════════════════════════════════════════════════ */
 
-function ServiceCard({
+function ServiceRow({
   name,
   region,
   ip,
   status,
-  billingCycle,
   periodEnd,
 }: {
   name: string;
   region: string;
   ip: string;
-  status: string;
-  billingCycle: string;
+  status: "active" | "stopped" | "provisioning";
   periodEnd: string;
 }) {
-  const statusColors: Record<string, { color: string; bg: string; border: string }> = {
-    active: { color: "var(--color-success)", bg: "rgba(108,232,166,0.08)", border: "rgba(108,232,166,0.15)" },
-    stopped: { color: "var(--color-fg-dim)", bg: "rgba(255,255,255,0.03)", border: "rgba(255,255,255,0.06)" },
-    provisioning: { color: "var(--color-accent)", bg: "var(--color-accent-soft)", border: "rgba(var(--accent-rgb),0.15)" },
-  };
-  const s = statusColors[status] ?? statusColors.stopped;
+  const statusMeta = {
+    active: { color: "var(--color-success)", label: "Active" },
+    stopped: { color: "var(--color-fg-dim)", label: "Stopped" },
+    provisioning: { color: "var(--color-accent)", label: "Provisioning" },
+  }[status];
 
   return (
-    <div className="studio-card group flex flex-col gap-4 rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)]/50 p-5 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-3">
-          <h3 className="text-[14px] font-semibold text-[var(--color-fg)] truncate">{name}</h3>
-          <span
-            className="shrink-0 rounded-full border px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider"
-            style={{ color: s.color, backgroundColor: s.bg, borderColor: s.border }}
-          >
-            {status}
-          </span>
-        </div>
-        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-[var(--color-fg-muted)]">
-          {ip && <span className="font-mono">{ip}</span>}
-          <span>{region}</span>
-          <span className="capitalize">{billingCycle}</span>
-          <span>•</span>
-          <span>berakhir {periodEnd}</span>
-        </div>
-      </div>
-      <div className="flex items-center gap-2">
-        <span className="material-symbols-outlined text-[16px] text-[var(--color-fg-dim)] transition-transform group-hover:translate-x-1 group-hover:text-[var(--color-accent)]" style={{ fontVariationSettings: '"FILL" 0, "wght" 300, "GRAD" 0, "opsz" 20' }}>
-          chevron_right
-        </span>
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   QUICK ACTION
-   ═══════════════════════════════════════════════════════════════════════ */
-
-function QuickAction({ icon, label, href, delay }: { icon: string; label: string; href: string; delay: number }) {
-  return (
-    <Link
-      href={href}
-      className="reveal-rise group relative grid place-items-center gap-2 overflow-hidden rounded-xl border border-[var(--color-line)]/80 bg-black/40 py-5 transition-all duration-[var(--dur-standard)] hover:border-[var(--color-accent)]/40"
-      style={{ transitionDelay: `${delay}ms` }}
-    >
-      <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(var(--accent-rgb),0.08),transparent_70%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+    <li className="flex items-center gap-4 border-b border-[var(--color-line)]/60 px-5 py-4 last:border-0 transition-colors hover:bg-white/[0.015]">
       <span
-        className="material-symbols-outlined relative text-[26px] text-[var(--color-accent)] transition-transform duration-200 group-hover:scale-110"
-        style={{ fontVariationSettings: '"FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24' }}
-      >
-        {icon}
-      </span>
-      <span className="studio-eyebrow relative text-[9px] text-[var(--color-fg-muted)]">{label}</span>
-    </Link>
+        className="h-2 w-2 shrink-0 rounded-full"
+        style={{ background: statusMeta.color }}
+        aria-label={statusMeta.label}
+      />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[13px] font-medium text-[var(--color-fg)]">
+          {name}
+        </p>
+        <p className="mt-0.5 flex flex-wrap items-center gap-x-3 text-[11px] text-[var(--color-fg-dim)]">
+          <span className="font-mono">{ip}</span>
+          <span>{region}</span>
+        </p>
+      </div>
+      <div className="shrink-0 text-right">
+        <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--color-fg-dim)]">
+          Berakhir
+        </p>
+        <p className="mt-0.5 text-[12px] text-[var(--color-fg-muted)]">
+          {periodEnd}
+        </p>
+      </div>
+    </li>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   TRANSACTION ROW
+   MOCK DATA
    ═══════════════════════════════════════════════════════════════════════ */
 
-function TransactionRow({
-  icon,
-  iconColor,
-  title,
-  desc,
-  amount,
-  amountColor,
-  time,
-}: {
-  icon: string;
-  iconColor: string;
-  title: string;
-  desc: string;
-  amount: string;
-  amountColor: string;
-  time: string;
-}) {
-  return (
-    <div className="flex items-center gap-3 rounded-xl border border-[var(--color-line)]/60 bg-[var(--color-surface)]/30 px-4 py-3 transition-all duration-200 hover:border-[var(--color-accent)]/20 hover:bg-white/[0.02]">
-      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-[var(--color-line)]" style={{ background: `${iconColor}08` }}>
-        <span className="material-symbols-outlined text-[16px]" style={{ color: iconColor, fontVariationSettings: '"FILL" 0, "wght" 300, "GRAD" 0, "opsz" 20' }}>
-          {icon}
-        </span>
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-[13px] font-medium text-[var(--color-fg)]">{title}</p>
-        <p className="text-[10px] text-[var(--color-fg-muted)]">{desc}</p>
-      </div>
-      <div className="text-right">
-        <span className="font-mono text-[13px] font-semibold" style={{ color: amountColor }}>{amount}</span>
-        <p className="text-[9px] text-[var(--color-fg-dim)]">{time}</p>
-      </div>
-    </div>
-  );
-}
+const NEXT_INVOICE = {
+  name: "VPS Jakarta Pro",
+  amount: "Rp 2.450.000",
+  dueDateLabel: "15 Jul 2026",
+  dueDateISO: "2026-07-15",
+};
 
-/* ═══════════════════════════════════════════════════════════════════════
-   EMAIL VERIFICATION BANNER
-   ═══════════════════════════════════════════════════════════════════════ */
-
-function VerificationBanner() {
-  return (
-    <div className="reveal-rise flex items-center gap-3 rounded-2xl border border-[var(--color-amber)]/20 bg-[var(--color-amber-soft)] px-5 py-4">
-      <span className="material-symbols-outlined text-[20px] text-[var(--color-amber)]" style={{ fontVariationSettings: '"FILL" 0, "wght" 400, "GRAD" 0, "opsz" 20' }}>
-        warning
-      </span>
-      <p className="flex-1 text-[13px] text-[var(--color-fg)]">
-        Email kamu belum diverifikasi.{" "}
-        <Link href="/verify-email" className="text-[var(--color-accent)] underline underline-offset-2 hover:no-underline">
-          Kirim ulang verifikasi
-        </Link>
-      </p>
-      <span className="material-symbols-outlined text-[16px] text-[var(--color-fg-dim)]" style={{ fontVariationSettings: '"FILL" 0, "wght" 300, "GRAD" 0, "opsz" 20' }}>
-        close
-      </span>
-    </div>
-  );
-}
+const SERVICES: Array<{
+  name: string;
+  region: string;
+  ip: string;
+  status: "active" | "stopped" | "provisioning";
+  periodEnd: string;
+}> = [
+  {
+    name: "VPS Jakarta Pro",
+    region: "JKT-1",
+    ip: "103.58.xx.xx",
+    status: "active",
+    periodEnd: "15 Jul 2026",
+  },
+  {
+    name: "Dedicated Surabaya",
+    region: "SUB-3",
+    ip: "36.95.xx.xx",
+    status: "active",
+    periodEnd: "28 Feb 2027",
+  },
+  {
+    name: "VPS Singapore Starter",
+    region: "SGP-2",
+    ip: "—",
+    status: "provisioning",
+    periodEnd: "12 Jul 2026",
+  },
+];
 
 /* ═══════════════════════════════════════════════════════════════════════
    MAIN PAGE
    ═══════════════════════════════════════════════════════════════════════ */
-
-const BILLING_DATA = [
-  { label: "Monthly", value: 68, color: "var(--color-accent)" },
-  { label: "Yearly", value: 24, color: "var(--color-magenta)" },
-  { label: "Hourly", value: 8, color: "var(--color-steel)" },
-];
-
-const MOCK_SERVICES = [
-  { name: "VPS Jakarta Pro", region: "JKT-1", ip: "103.58.xx.xx", status: "active", billingCycle: "monthly", periodEnd: "15 Jul 2026" },
-  { name: "Dedicated Surabaya", region: "SUB-3", ip: "36.95.xx.xx", status: "active", billingCycle: "yearly", periodEnd: "28 Feb 2027" },
-  { name: "VPS Singapore Starter", region: "SGP-2", ip: "—", status: "provisioning", billingCycle: "monthly", periodEnd: "— provisioning" },
-];
-
-const MOCK_TRANSACTIONS = [
-  { icon: "payments", iconColor: "var(--color-success)", title: "Pembayaran berhasil", desc: "Invoice INV-1247 — VPS Jakarta Pro", amount: "-Rp 2.450.000", amountColor: "var(--color-success)", time: "15 Jun" },
-  { icon: "add_circle", iconColor: "var(--color-accent)", title: "Order baru", desc: "VPS Singapore Starter — Monthly", amount: "Rp 1.200.000", amountColor: "var(--color-fg)", time: "12 Jun" },
-  { icon: "receipt_long", iconColor: "var(--color-steel)", title: "Invoice dibuat", desc: "INV-1248 — Dedicated Surabaya", amount: "Rp 54.000.000", amountColor: "var(--color-fg-muted)", time: "1 Jun" },
-  { icon: "restart_alt", iconColor: "var(--color-accent)", title: "Restart deployment", desc: "VPS Jakarta Pro — manual restart", amount: "—", amountColor: "var(--color-fg-dim)", time: "28 Mei" },
-  { icon: "payments", iconColor: "var(--color-success)", title: "Pembayaran berhasil", desc: "Invoice INV-1245 — VPS Jakarta Pro", amount: "-Rp 2.450.000", amountColor: "var(--color-success)", time: "15 Mei" },
-];
 
 export default function CustomerDashboardPage() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadSession() {
+    (async () => {
       try {
         const s = await getSession();
         setSession(s);
       } catch {
-        // Not authenticated
+        /* unauthenticated — page is gated upstream */
       } finally {
         setLoading(false);
       }
-    }
-    loadSession();
+    })();
   }, []);
 
   const firstName = session?.user?.name?.split(" ")[0] ?? "User";
   const isVerified = session?.user?.email_verified_at !== null;
+  const daysLeft = daysUntil(NEXT_INVOICE.dueDateISO);
+  const activeServices = SERVICES.filter((s) => s.status === "active").length;
+  const totalServices = SERVICES.length;
+  const activeRatio =
+    totalServices > 0 ? Math.round((activeServices / totalServices) * 100) : 0;
 
   return (
     <RevealOnScroll>
-      <div className="mx-auto w-full max-w-[1320px] px-6 py-8">
-        {/* ────────────────────── WELCOME HEADER ────────────────────── */}
-        <section className="reveal-rise mb-8">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="studio-eyebrow text-accent">Dashboard</p>
-              <h1 className="studio-display mt-3 text-[clamp(28px,4vw,44px)] text-[var(--color-fg)]">
-                Selamat datang, {firstName}
-              </h1>
-              <p className="mt-2 text-[13px] text-[var(--color-fg-muted)]">
-                Ringkasan layanan, tagihan, dan aktivitas akun Anda.
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="studio-eyebrow rounded-full border border-[var(--color-line)] px-3 py-1.5 text-[9px] text-[var(--color-fg-dim)]">
-                {session?.user?.email ?? "user@jadenode.id"}
-              </span>
+      <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
+        {/* ────────────────────── HEADER ────────────────────── */}
+        <header className="reveal-rise mb-10 flex items-end justify-between gap-6">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-fg-dim)]">
+              JadeNode · Customer
+            </p>
+            <h1 className="mt-2 text-[36px] font-bold leading-none tracking-tight text-[var(--color-fg)]">
+              Halo, {firstName}
+            </h1>
+          </div>
+          <span className="hidden truncate rounded-full border border-[var(--color-line)] px-3 py-1.5 font-mono text-[10px] text-[var(--color-fg-dim)] sm:block">
+            {session?.user?.email ?? "—"}
+          </span>
+        </header>
+
+        {/* ─────────── VERIFICATION BANNER (compact, conditional) ─────────── */}
+        {!loading && !isVerified && (
+          <div className="reveal-rise mb-8 overflow-hidden rounded-xl border border-[var(--color-amber)]/25 bg-[var(--color-amber)]/[0.04]">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
+              <div className="flex items-center gap-2">
+                <MIcon name="mark_email_unread" size={16} color="var(--color-amber)" />
+                <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--color-amber)]">
+                  Email Belum Terverifikasi
+                </span>
+              </div>
+              <Link
+                href="/verify-email"
+                className="text-[12px] text-[var(--color-fg-muted)] underline-offset-2 hover:text-[var(--color-fg)] hover:underline"
+              >
+                Kirim ulang verifikasi →
+              </Link>
             </div>
           </div>
-        </section>
-
-        {/* ────────────────────── EMAIL VERIFICATION ────────────────────── */}
-        {!loading && !isVerified && (
-          <section className="mb-6">
-            <VerificationBanner />
-          </section>
         )}
 
-        {/* ────────────────────── KPI GRID ────────────────────── */}
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <KPICard label="Active Services" value="3" sub="2 VPS · 1 Dedicated" icon="dns" trend="neutral" delay={0} />
-          <KPICard label="Total Spending" value="Rp 12.4M" sub="year-to-date · 2026" icon="account_balance_wallet" trend="up" delay={80} />
-          <KPICard label="Open Tickets" value="1" sub="menunggu respons" icon="confirmation_number" trend="neutral" delay={160} />
-          <KPICard label="Next Invoice" value="15 Jul" sub="Rp 2.450.000 — VPS JKT" icon="calendar_clock" delay={240} />
-        </section>
+        {/* ────────────── HERO STATS — 2 statistik utama ────────────── */}
+        <section className="reveal-rise mb-12 grid gap-4 lg:grid-cols-3">
+          {/* PRIMARY: Tagihan Berikutnya */}
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--color-accent)]/25 bg-gradient-to-br from-[var(--color-accent)]/[0.08] via-transparent to-transparent p-7 lg:col-span-2">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 opacity-[0.04]"
+              style={{
+                backgroundImage:
+                  "linear-gradient(var(--color-accent) 1px, transparent 1px), linear-gradient(90deg, var(--color-accent) 1px, transparent 1px)",
+                backgroundSize: "32px 32px",
+              }}
+            />
+            <div className="relative">
+              <div className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-accent)]">
+                  Tagihan Berikutnya
+                </p>
+              </div>
+              <p className="mt-4 text-[56px] font-bold leading-none tracking-tight text-[var(--color-fg)]">
+                {NEXT_INVOICE.amount}
+              </p>
+              <p className="mt-3 text-[13px] text-[var(--color-fg-muted)]">
+                {NEXT_INVOICE.name}
+              </p>
+              <div className="mt-6 flex flex-wrap items-end gap-x-8 gap-y-3 border-t border-[var(--color-line)]/60 pt-5">
+                <div>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-[var(--color-fg-dim)]">
+                    Jatuh Tempo
+                  </p>
+                  <p className="mt-1 text-[15px] font-semibold text-[var(--color-fg)]">
+                    {NEXT_INVOICE.dueDateLabel}
+                  </p>
+                </div>
+                <div>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-[var(--color-fg-dim)]">
+                    Sisa Waktu
+                  </p>
+                  <p
+                    className="mt-1 text-[15px] font-semibold"
+                    style={{
+                      color:
+                        daysLeft <= 7
+                          ? "var(--color-amber)"
+                          : "var(--color-fg)",
+                    }}
+                  >
+                    {daysLeft} hari
+                  </p>
+                </div>
+                <Link
+                  href="/invoices"
+                  className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-accent)]/30 bg-[var(--color-accent-soft)] px-4 py-2 text-[12px] font-medium text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent)]/15"
+                >
+                  Bayar sekarang
+                  <MIcon name="arrow_forward" size={14} />
+                </Link>
+              </div>
+            </div>
+          </div>
 
-        {/* ────────────────────── QUICK ACTIONS ────────────────────── */}
-        <section className="reveal-rise mt-8">
-          <p className="studio-eyebrow mb-4 text-[9px] text-[var(--color-fg-dim)]">
-            Aksi Cepat
-          </p>
-          <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-5">
-            <QuickAction icon="add_shopping_cart" label="Order Baru" href="/marketplace" delay={0} />
-            <QuickAction icon="receipt_long" label="Invoice" href="/invoices" delay={50} />
-            <QuickAction icon="dns" label="Deployments" href="/deployments" delay={100} />
-            <QuickAction icon="confirmation_number" label="Support" href="/tickets" delay={150} />
-            <QuickAction icon="settings" label="Pengaturan" href="/settings" delay={200} />
+          {/* SECONDARY: Layanan Aktif */}
+          <div className="flex flex-col rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)]/60 p-7">
+            <div className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-steel)]" />
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-fg-dim)]">
+                Layanan Aktif
+              </p>
+            </div>
+            <p className="mt-4 text-[56px] font-bold leading-none tracking-tight text-[var(--color-fg)]">
+              {activeServices}
+            </p>
+            <p className="mt-3 text-[13px] text-[var(--color-fg-muted)]">
+              dari {totalServices} deployment
+            </p>
+            <div className="mt-auto pt-6">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--color-fg-dim)]">
+                  Berjalan
+                </span>
+                <span className="font-mono text-[10px] text-[var(--color-fg-muted)]">
+                  {activeRatio}%
+                </span>
+              </div>
+              <div className="mt-2 h-1 overflow-hidden rounded-full bg-[var(--color-line)]">
+                <div
+                  className="h-full rounded-full bg-[var(--color-success)] transition-all duration-700"
+                  style={{ width: `${activeRatio}%` }}
+                />
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* ────────────────────── ANALYTICS BENTO ────────────────────── */}
-        <section className="mt-10 grid gap-4 lg:grid-cols-2">
-          {/* Spending Trend — Area Chart */}
-          <article className="studio-card reveal-rise overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)]/50 p-6">
-            <div className="mb-5 flex items-center justify-between">
-              <div>
-                <span className="studio-eyebrow text-[9px] text-[var(--color-fg-dim)]">
-                  Spending Trend
-                </span>
-                <h3 className="studio-display mt-2 text-[22px] text-[var(--color-fg)]">
-                  Pengeluaran bulanan
-                </h3>
-              </div>
-              <span className="rounded-full border border-[var(--color-line)] px-3 py-1 font-mono text-[10px] text-[var(--color-fg-muted)]">
-                12 bulan
-              </span>
-            </div>
-            <SpendingChart />
-            <div className="mt-4 flex items-center gap-4 border-t border-[var(--color-line)]/80 pt-3">
-              <div>
-                <span className="studio-display text-[18px] text-[var(--color-fg)]">Rp 2.45M</span>
-                <span className="ml-1 text-[10px] text-[var(--color-fg-dim)]">bulan ini</span>
-              </div>
-              <span className="text-[10px] text-[var(--color-fg-dim)]">avg</span>
-              <span className="studio-display text-[18px] text-[var(--color-fg-muted)]">Rp 1.8M</span>
-              <span className="ml-1 text-[10px] text-[var(--color-fg-dim)]">/bulan</span>
-            </div>
-          </article>
-
-          {/* Billing Cycle Distribution — Pie + Uptime */}
-          <article className="studio-card reveal-rise overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)]/50 p-6">
-            <div className="mb-5 flex items-center justify-between">
-              <div>
-                <span className="studio-eyebrow text-[9px] text-[var(--color-fg-dim)]">
-                  Siklus &amp; Uptime
-                </span>
-                <h3 className="studio-display mt-2 text-[22px] text-[var(--color-fg)]">
-                  Distribusi billing
-                </h3>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="pulse-dot h-2 w-2 rounded-full bg-[var(--color-success)]" />
-                <span className="font-mono text-[10px] text-[var(--color-fg-muted)]">
-                  99.9% uptime
-                </span>
-              </div>
-            </div>
-            <DonutChart data={BILLING_DATA} />
-            <div className="mt-4">
-              <p className="studio-eyebrow mb-2 text-[8px] text-[var(--color-fg-dim)]">
-                Uptime — 30 hari terakhir
-              </p>
-              <Sparkline />
-            </div>
-          </article>
-        </section>
-
-        {/* ────────────────────── ACTIVE SERVICES ────────────────────── */}
-        <section className="reveal-rise mt-4">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <span className="studio-eyebrow text-[9px] text-[var(--color-fg-dim)]">
-                Layanan Aktif
-              </span>
-              <h3 className="studio-display mt-2 text-[22px] text-[var(--color-fg)]">
-                Deployment Anda
-              </h3>
-            </div>
+        {/* ────────────── LAYANAN AKTIF — list ────────────── */}
+        <section className="reveal-rise mb-10">
+          <div className="mb-4 flex items-baseline justify-between">
+            <h2 className="text-[14px] font-semibold tracking-tight text-[var(--color-fg)]">
+              Deployment Anda
+            </h2>
             <Link
               href="/deployments"
-              className="studio-eyebrow inline-flex items-center gap-1.5 text-[var(--color-accent)] hover:underline"
+              className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--color-fg-dim)] transition-colors hover:text-[var(--color-accent)]"
             >
-              Lihat semua
-              <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: '"FILL" 0, "wght" 300, "GRAD" 0, "opsz" 20' }}>
-                north_east
-              </span>
+              Lihat semua →
             </Link>
           </div>
-          <div className="grid gap-3">
-            {MOCK_SERVICES.map((svc, i) => (
-              <ServiceCard key={svc.name} {...svc} />
+          <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)]/60">
+            {SERVICES.length > 0 ? (
+              <ul>
+                {SERVICES.map((svc) => (
+                  <ServiceRow key={svc.name} {...svc} />
+                ))}
+              </ul>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-3 py-12">
+                <MIcon name="cloud_off" size={28} color="var(--color-fg-dim)" />
+                <span className="text-[12px] text-[var(--color-fg-dim)]">
+                  Belum ada deployment
+                </span>
+                <Link
+                  href="/marketplace"
+                  className="mt-1 inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-accent)]/30 px-3 py-1.5 text-[11px] font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10"
+                >
+                  Telusuri marketplace
+                </Link>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* ────────────── AKSES CEPAT ────────────── */}
+        <section className="reveal-rise">
+          <h2 className="mb-4 text-[14px] font-semibold tracking-tight text-[var(--color-fg)]">
+            Akses Cepat
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {[
+              {
+                icon: "add_shopping_cart",
+                label: "Order Baru",
+                href: "/marketplace",
+              },
+              { icon: "receipt_long", label: "Invoice", href: "/invoices" },
+              {
+                icon: "confirmation_number",
+                label: "Tiket",
+                href: "/tickets",
+              },
+              { icon: "settings", label: "Pengaturan", href: "/settings" },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="group flex flex-col gap-3 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)]/60 p-4 transition-all hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-surface)]"
+              >
+                <MIcon
+                  name={item.icon}
+                  size={20}
+                  className="text-[var(--color-fg-dim)] transition-colors group-hover:text-[var(--color-accent)]"
+                />
+                <span className="text-[12px] font-medium text-[var(--color-fg-muted)] transition-colors group-hover:text-[var(--color-fg)]">
+                  {item.label}
+                </span>
+              </Link>
             ))}
           </div>
         </section>
-
-        {/* ────────────────────── PAYMENT SUMMARY BENTO ────────────────────── */}
-        <section className="mt-4 grid gap-4 lg:grid-cols-3">
-          {/* Upcoming Payment */}
-          <article className="studio-card reveal-rise rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)]/50 p-6">
-            <span className="studio-eyebrow text-[9px] text-[var(--color-fg-dim)]">
-              Pembayaran Berikutnya
-            </span>
-            <h3 className="studio-display mt-2 text-[20px] text-[var(--color-fg)]">
-              Invoice mendatang
-            </h3>
-            <div className="mt-5 space-y-3">
-              {[
-                { name: "VPS Jakarta Pro", amount: "Rp 2.450.000", due: "15 Jul 2026" },
-                { name: "VPS Singapore Starter", amount: "Rp 1.200.000", due: "12 Jul 2026" },
-              ].map((inv, i) => (
-                <div key={i} className="flex items-center justify-between rounded-xl border border-[var(--color-line)]/80 bg-black/40 px-4 py-3">
-                  <div>
-                    <p className="text-[12px] font-medium text-[var(--color-fg)]">{inv.name}</p>
-                    <p className="font-mono text-[9px] text-[var(--color-fg-dim)]">Jatuh tempo: {inv.due}</p>
-                  </div>
-                  <span className="studio-display text-[16px] text-[var(--color-accent)]">{inv.amount}</span>
-                </div>
-              ))}
-            </div>
-            <Link
-              href="/invoices"
-              className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl border border-[var(--color-accent)]/20 bg-[var(--color-accent-soft)] py-2.5 text-[12px] font-medium text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent)]/20"
-            >
-              <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: '"FILL" 0, "wght" 300, "GRAD" 0, "opsz" 20' }}>
-                receipt_long
-              </span>
-              Lihat semua invoice
-            </Link>
-          </article>
-
-          {/* Recent Orders */}
-          <article className="studio-card reveal-rise rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)]/50 p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <span className="studio-eyebrow text-[9px] text-[var(--color-fg-dim)]">
-                Pesanan Terbaru
-              </span>
-              <Link href="/orders" className="studio-eyebrow text-[8px] text-[var(--color-accent)] hover:underline">
-                Semua
-              </Link>
-            </div>
-            <div className="space-y-2">
-              {[
-                { id: "ORD-8472", name: "VPS Singapore Starter", status: "paid", statusColor: "var(--color-success)", amount: "Rp 1.200.000" },
-                { id: "ORD-8451", name: "VPS Jakarta Pro", status: "active", statusColor: "var(--color-accent)", amount: "Rp 2.450.000" },
-                { id: "ORD-8390", name: "Dedicated Surabaya", status: "active", statusColor: "var(--color-accent)", amount: "Rp 54.000.000" },
-              ].map((order) => (
-                <div key={order.id} className="flex items-center justify-between rounded-xl border border-[var(--color-line)]/60 bg-black/30 px-4 py-2.5">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[12px] font-medium text-[var(--color-fg)] truncate">{order.name}</p>
-                    <p className="font-mono text-[9px] text-[var(--color-fg-dim)]">{order.id}</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="font-mono text-[11px] font-semibold text-[var(--color-fg-muted)]">{order.amount}</span>
-                    <span className="h-1.5 w-1.5 rounded-full" style={{ background: order.statusColor }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </article>
-
-          {/* Support Ticket Quick View */}
-          <article className="studio-card reveal-rise rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)]/50 p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <span className="studio-eyebrow text-[9px] text-[var(--color-fg-dim)]">
-                Tiket Support
-              </span>
-              <Link href="/tickets" className="studio-eyebrow text-[8px] text-[var(--color-accent)] hover:underline">
-                Semua
-              </Link>
-            </div>
-            <div className="space-y-2">
-              {[
-                { subject: "VPS restart gagal", status: "open", count: 1, color: "var(--color-error)", bg: "rgba(255,122,122,0.1)", border: "rgba(255,122,122,0.2)" },
-                { subject: "Upgrade RAM Jakarta Pro", status: "resolved", count: 3, color: "var(--color-success)", bg: "rgba(108,232,166,0.1)", border: "rgba(108,232,166,0.2)" },
-                { subject: "Billing clarification", status: "closed", count: 5, color: "var(--color-fg-dim)", bg: "rgba(255,255,255,0.03)", border: "rgba(255,255,255,0.06)" },
-              ].map((t) => (
-                <div
-                  key={t.subject}
-                  className="flex items-center justify-between rounded-xl border px-4 py-2.5 transition-colors hover:bg-white/[0.02]"
-                  style={{ background: t.bg, borderColor: t.border }}
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[12px] font-medium text-[var(--color-fg)] truncate">{t.subject}</p>
-                    <p className="text-[9px] text-[var(--color-fg-dim)]">{t.count} pesan · {t.status}</p>
-                  </div>
-                  <span className="material-symbols-outlined text-[16px] text-[var(--color-fg-dim)]" style={{ fontVariationSettings: '"FILL" 0, "wght" 300, "GRAD" 0, "opsz" 20' }}>
-                    chevron_right
-                  </span>
-                </div>
-              ))}
-            </div>
-            <Link
-              href="/tickets/new"
-              className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl bg-[var(--color-accent)] py-2.5 text-[12px] font-bold text-[var(--color-accent-fg)] transition-opacity hover:opacity-90"
-            >
-              <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: '"FILL" 0, "wght" 400, "GRAD" 0, "opsz" 20' }}>
-                add
-              </span>
-              Buat Tiket Baru
-            </Link>
-          </article>
-        </section>
-
-        {/* ────────────────────── TRANSACTION HISTORY ────────────────────── */}
-        <section className="reveal-rise mt-4">
-          <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)]/50 p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <span className="studio-eyebrow text-[9px] text-[var(--color-fg-dim)]">
-                  Riwayat Transaksi
-                </span>
-                <h3 className="studio-display mt-2 text-[22px] text-[var(--color-fg)]">
-                  Aktivitas akun
-                </h3>
-              </div>
-              <span className="rounded-full border border-[var(--color-line)] px-3 py-1 font-mono text-[10px] text-[var(--color-fg-muted)]">
-                30 hari
-              </span>
-            </div>
-            <div className="grid gap-2">
-              {MOCK_TRANSACTIONS.map((tx, i) => (
-                <TransactionRow key={i} {...tx} />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ────────────────────── RESOURCE USAGE ────────────────────── */}
-        <section className="reveal-rise mt-4">
-          <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)]/50 p-6">
-            <span className="studio-eyebrow text-[9px] text-[var(--color-fg-dim)]">
-              Pemakaian Resource
-            </span>
-            <h3 className="studio-display mt-2 text-[22px] text-[var(--color-fg)]">
-              Utilisasi server
-            </h3>
-            <div className="mt-5 grid gap-6 sm:grid-cols-2">
-              {[
-                { label: "CPU Usage", value: 34, color: "var(--color-accent)" },
-                { label: "Memory", value: 62, color: "var(--color-magenta)" },
-                { label: "Disk I/O", value: 18, color: "var(--color-steel)" },
-                { label: "Bandwidth", value: 45, color: "var(--color-accent)" },
-              ].map((res) => (
-                <div key={res.label}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] text-[var(--color-fg-muted)]">{res.label}</span>
-                    <span className="font-mono text-[11px] font-semibold text-[var(--color-fg)]">{res.value}%</span>
-                  </div>
-                  <div className="studio-bar h-2 overflow-hidden rounded-full bg-white/[0.04]">
-                    <span
-                      className="block h-full rounded-full"
-                      style={{
-                        width: `${res.value}%`,
-                        background: res.color,
-                        transition: "width 1.6s cubic-bezier(0.22,1,0.36,1)",
-                        transitionDelay: "600ms",
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ────────────────────── FOOTER ────────────────────── */}
-        <footer className="mt-12 border-t border-[var(--color-line)]/70 px-0 py-6">
-          <div className="flex items-center justify-between">
-            <span className="studio-eyebrow text-[9px] text-[var(--color-fg-dim)]">
-              © 2026 JadeNode Marketplace · Customer Panel
-            </span>
-            <span className="flex items-center gap-2 text-[11px] text-[var(--color-fg-muted)]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-success)]" />
-              Semua layanan beroperasi normal
-            </span>
-          </div>
-        </footer>
       </div>
     </RevealOnScroll>
   );

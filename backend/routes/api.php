@@ -51,7 +51,9 @@ Route::get('/v1/health', HealthController::class);
 Route::get('/v1/ready', [HealthController::class, 'ready']);
 
 // Auth — Public
-Route::prefix('v1/auth')->group(function () {
+// Login & logout need the `web` middleware so the session store is available
+// (Auth::attempt + session()->regenerate() both require an active session).
+Route::prefix('v1/auth')->middleware('web')->group(function () {
     Route::post('/register', [RegisterController::class, 'register']);
     Route::post('/login', [LoginController::class, 'login']);
 });
@@ -153,6 +155,12 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', EnsureIsAdmin::class])->g
 
     // Users — Admin
     Route::get('/users', [AdminUserController::class, 'index']);
+    Route::post('/users', [AdminUserController::class, 'store']);
+    Route::get('/users/{id}', [AdminUserController::class, 'show']);
+    Route::put('/users/{id}', [AdminUserController::class, 'update']);
+    Route::delete('/users/{id}', [AdminUserController::class, 'destroy']);
+    Route::post('/users/{id}/restore', [AdminUserController::class, 'restore']);
+    Route::post('/users/{id}/verify-email', [AdminUserController::class, 'verifyEmail']);
 
     // Audit Logs — Admin
     Route::get('/audit-logs', [AdminAuditController::class, 'index']);

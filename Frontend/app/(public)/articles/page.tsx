@@ -276,14 +276,14 @@ function ArticleCard({ article }: { article: ArticleData }) {
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="studio-display text-[15px] font-semibold leading-snug text-fg transition-colors group-hover:text-accent">
+        {/* Fixed 2-line title + 2-line excerpt keep every card's internal
+            rhythm identical regardless of how the text wraps per viewport. */}
+        <h3 className="studio-display line-clamp-2 min-h-[2.75em] text-[15px] font-semibold leading-snug text-fg transition-colors group-hover:text-accent">
           {article.title}
         </h3>
-        {article.excerpt && (
-          <p className="mt-2 line-clamp-2 text-[12px] leading-relaxed text-fg-muted">
-            {article.excerpt}
-          </p>
-        )}
+        <p className="mt-2 line-clamp-2 min-h-[3.25em] text-[12px] leading-relaxed text-fg-muted">
+          {article.excerpt}
+        </p>
         <div className="mt-auto flex items-center gap-3 pt-4">
           <div className="flex items-center gap-1.5 text-[10px] text-fg-dim">
             <span

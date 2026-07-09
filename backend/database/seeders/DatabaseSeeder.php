@@ -11,7 +11,7 @@ class DatabaseSeeder extends Seeder
      *
      * Order matters — each seeder depends on records created by prior ones.
      *
-     * Flow:  Users → Marketplace → BetaAccess → OrderFlow → SshKey → Support → Audit
+     * Flow:  Users → Marketplace → BetaAccess → OrderFlow → SshKey → Support → Audit → Articles
      */
     public function run(): void
     {
@@ -36,6 +36,9 @@ class DatabaseSeeder extends Seeder
 
             // 7. Admin audit logs + audit trail
             AuditLogSeeder::class,
+
+            // 8. Public knowledge-base / news articles (landing "Artikel" menu)
+            ArticleSeeder::class,
         ]);
 
         $this->command->newLine();

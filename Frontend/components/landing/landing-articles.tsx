@@ -116,14 +116,12 @@ export function LandingArticles() {
 
           {/* Content */}
           <div className="flex flex-1 flex-col p-6">
-            <h3 className="studio-display text-[15px] font-semibold leading-snug text-fg transition-colors group-hover:text-accent">
+            <h3 className="studio-display line-clamp-2 min-h-[2.75em] text-[15px] font-semibold leading-snug text-fg transition-colors group-hover:text-accent">
               {article.title}
             </h3>
-            {article.excerpt && (
-              <p className="mt-2.5 line-clamp-2 text-[12px] leading-relaxed text-fg-muted">
-                {article.excerpt}
-              </p>
-            )}
+            <p className="mt-2.5 line-clamp-2 min-h-[3.25em] text-[12px] leading-relaxed text-fg-muted">
+              {article.excerpt}
+            </p>
 
             {/* Author + meta */}
             <div className="mt-auto flex items-center gap-3 pt-5">

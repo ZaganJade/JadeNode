@@ -17,7 +17,7 @@ class ResourceActionController
     public function adminIndex(Request $request): AnonymousResourceCollection
     {
         $actions = ResourceAction::query()
-            ->with(['deployment', 'user']);
+            ->with(['deployment', 'user', 'processor']);
 
         if ($request->filled('status')) {
             $actions->where('status', $request->input('status'));
