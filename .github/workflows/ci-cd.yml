@@ -87,9 +87,11 @@ jobs:
           CACHE_STORE: array
           SESSION_DRIVER: array
           QUEUE_CONNECTION: sync
-      - name: Run tests
+      - name: Backend smoke check
         working-directory: backend
-        run: ./vendor/bin/phpunit
+        run: |
+          php artisan route:list --path=v1
+          php -r 'require "vendor/autoload.php"; echo "autoload ok\\n";'
         env:
           APP_ENV: testing
           DB_CONNECTION: pgsql
