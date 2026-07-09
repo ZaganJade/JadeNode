@@ -11,7 +11,7 @@ cd "$APP_DIR"
 
 load_1m="$(awk '{print $1}' /proc/loadavg)"
 mem_available_mb="$(free -m | awk '/Mem:/ {print $7}')"
-if awk -v load="$load_1m" -v max="$MAX_LOAD_1M" 'BEGIN { exit !(load > max) }'; then
+if awk -v current_load="$load_1m" -v max="$MAX_LOAD_1M" 'BEGIN { exit !(current_load > max) }'; then
   echo "Refusing deploy: load_1m=$load_1m > MAX_LOAD_1M=$MAX_LOAD_1M"
   exit 75
 fi
@@ -34,7 +34,16 @@ docker compose -f "$COMPOSE_FILE" up -d --remove-orphans
 
 docker compose -f "$COMPOSE_FILE" ps
 curl -fsS http://127.0.0.1:8091/api/v1/health >/dev/null
-curl -fsS http://127.0.0.1:3100/ >/dev/null
+for i in $(seq 1 30); do
+  if curl -fsS http://127.0.0.1:3100/ >/dev/null; then
+    break
+  fi
+  if [ "$i" -eq 30 ]; then
+    echo "Frontend did not become ready on 127.0.0.1:3100"
+    exit 1
+  fi
+  sleep 2
+done
 sudo nginx -t >/dev/null
 curl -fsS https://jadenode.vibedev.web.id/api/v1/health >/dev/null
 
