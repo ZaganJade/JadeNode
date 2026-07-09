@@ -1,0 +1,35 @@
+FROM node:22-alpine AS deps
+WORKDIR /app
+RUN corepack enable
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY Frontend/package.json ./Frontend/package.json
+COPY packages/shared/api-client/package.json ./packages/shared/api-client/package.json
+COPY packages/shared/constants/package.json ./packages/shared/constants/package.json
+COPY packages/shared/types/package.json ./packages/shared/types/package.json
+RUN pnpm install --frozen-lockfile --config.dangerouslyAllowAllBuilds=true
+
+FROM node:22-alpine AS builder
+WORKDIR /app
+RUN corepack enable
+ENV NEXT_TELEMETRY_DISABLED=1
+COPY --from=deps /app/node_modules ./node_modules
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY Frontend ./Frontend
+COPY packages ./packages
+ARG NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+RUN pnpm --dir Frontend build
+
+FROM node:22-alpine AS runner
+WORKDIR /app
+RUN corepack enable
+ENV NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    PORT=3000 \
+    HOSTNAME=0.0.0.0
+COPY --from=builder /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/Frontend ./Frontend
+COPY --from=builder /app/packages ./packages
+EXPOSE 3000
+CMD ["pnpm", "--dir", "Frontend", "start"]

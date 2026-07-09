@@ -1,5 +1,5 @@
 packages:
-  - "frontend"
+  - "Frontend"
   - "packages/*"
 allowBuilds:
   msgpackr-extract: set this to true or false

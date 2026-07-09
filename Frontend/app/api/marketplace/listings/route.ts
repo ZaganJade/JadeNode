@@ -7,7 +7,8 @@ export async function GET(request: NextRequest) {
     const queryString = searchParams ? `?${searchParams}` : "";
 
     // Forward request to Laravel backend
-    const backendUrl = `http://localhost:8000/api/v1/marketplace/listings${queryString}`;
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+    const backendUrl = `${apiBaseUrl}/api/v1/marketplace/listings${queryString}`;
 
     console.log('Proxying to backend:', backendUrl);
 

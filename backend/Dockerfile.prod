@@ -1,0 +1,22 @@
+FROM dunglas/frankenphp:1-php8.4-alpine AS base
+
+RUN apk add --no-cache bash git postgresql-client icu-dev libzip-dev oniguruma-dev \
+    && install-php-extensions pdo_pgsql pgsql intl zip opcache
+
+WORKDIR /app
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY backend/composer.json backend/composer.lock ./
+RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --no-scripts --optimize-autoloader
+
+COPY backend/ ./
+COPY infra/docker/backend-entrypoint-prod.sh /usr/local/bin/jadenode-backend-entrypoint
+COPY infra/docker/Caddyfile.backend /etc/caddy/Caddyfile
+RUN chmod +x /usr/local/bin/jadenode-backend-entrypoint \
+    && mkdir -p storage/app/public storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
+    && chmod -R ug+rwX storage bootstrap/cache \
+    && composer dump-autoload --no-dev --optimize
+
+EXPOSE 8000
+ENTRYPOINT ["/usr/local/bin/jadenode-backend-entrypoint"]
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]

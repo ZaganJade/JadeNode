@@ -1,0 +1,119 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: jadenode-production
+  cancel-in-progress: false
+
+jobs:
+  frontend-build:
+    name: Frontend build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.11.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --config.dangerouslyAllowAllBuilds=true
+      - run: pnpm --dir Frontend build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: https://jadenode.vibedev.web.id
+
+  backend-tests:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: jadenode_test
+          POSTGRES_USER: jadenode
+          POSTGRES_PASSWORD: jadenode_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U jadenode -d jadenode_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, pgsql, intl, zip
+          coverage: none
+      - name: Install Composer dependencies
+        working-directory: backend
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Prepare Laravel env
+        working-directory: backend
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan config:clear
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: jadenode_test
+          DB_USERNAME: jadenode
+          DB_PASSWORD: jadenode_test
+          CACHE_STORE: array
+          SESSION_DRIVER: array
+          QUEUE_CONNECTION: sync
+      - name: Run migrations
+        working-directory: backend
+        run: php artisan migrate --force
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: jadenode_test
+          DB_USERNAME: jadenode
+          DB_PASSWORD: jadenode_test
+          CACHE_STORE: array
+          SESSION_DRIVER: array
+          QUEUE_CONNECTION: sync
+      - name: Run tests
+        working-directory: backend
+        run: php artisan test
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: jadenode_test
+          DB_USERNAME: jadenode
+          DB_PASSWORD: jadenode_test
+          CACHE_STORE: array
+          SESSION_DRIVER: array
+          QUEUE_CONNECTION: sync
+
+  deploy:
+    name: Deploy production
+    needs: [frontend-build, backend-tests]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script: |
+            /mnt/disk2/projects/JadeNode/infra/scripts/deploy-production.sh

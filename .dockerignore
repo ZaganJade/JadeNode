@@ -1,0 +1,15 @@
+node_modules
+.git
+.gitignore
+README.md
+docs
+bmad
+.env
+.env.*
+infra/docker/.env.production
+storage
+vendor
+Frontend/.next
+Frontend/node_modules
+backend/vendor
+backend/storage/logs/*.log

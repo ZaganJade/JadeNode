@@ -81,6 +81,9 @@ Thumbs.db
 # Generated API clients can be regenerated unless explicitly committed later
 packages/shared/api-client/generated/
 
+# Runtime storage mounted into production containers
+/storage/
+
 # Secrets / certificates
 *.pem
 *.key
@@ -92,7 +95,9 @@ packages/shared/api-client/generated/
 /docs
 bmad
 .playwright-mcp
-.github
+.github/*
+!.github/workflows/
+!.github/workflows/**
 .claude
 context.md
 design.md

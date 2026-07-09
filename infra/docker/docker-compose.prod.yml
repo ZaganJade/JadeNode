@@ -1,0 +1,64 @@
+name: jadenode
+
+services:
+  backend:
+    build:
+      context: ../..
+      dockerfile: backend/Dockerfile.prod
+    image: jadenode-backend:latest
+    container_name: jadenode-backend
+    restart: unless-stopped
+    env_file:
+      - ./.env.production
+    environment:
+      RUN_MIGRATIONS: "true"
+    volumes:
+      - /mnt/disk2/projects/JadeNode/storage/backend:/app/storage
+    networks:
+      - jadenode-net
+      - global-db-net
+    ports:
+      - "127.0.0.1:8091:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8000/api/v1/health >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    mem_limit: 384m
+
+  frontend:
+    build:
+      context: ../..
+      dockerfile: Frontend/Dockerfile.prod
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-https://jadenode.vibedev.web.id}
+    image: jadenode-frontend:latest
+    container_name: jadenode-frontend
+    restart: unless-stopped
+    env_file:
+      - ./.env.production
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - jadenode-net
+    ports:
+      - "127.0.0.1:3100:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/ >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    mem_limit: 512m
+
+networks:
+  jadenode-net:
+    name: jadenode-net
+  global-db-net:
+    external: true
