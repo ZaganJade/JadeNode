@@ -9,16 +9,32 @@ MIN_MEM_AVAILABLE_MB="${MIN_MEM_AVAILABLE_MB:-256}"
 
 cd "$APP_DIR"
 
-load_1m="$(awk '{print $1}' /proc/loadavg)"
-mem_available_mb="$(free -m | awk '/Mem:/ {print $7}')"
-if awk -v current_load="$load_1m" -v max="$MAX_LOAD_1M" 'BEGIN { exit !(current_load > max) }'; then
-  echo "Refusing deploy: load_1m=$load_1m > MAX_LOAD_1M=$MAX_LOAD_1M"
-  exit 75
-fi
-if [ "$mem_available_mb" -lt "$MIN_MEM_AVAILABLE_MB" ]; then
-  echo "Refusing deploy: mem_available_mb=$mem_available_mb < MIN_MEM_AVAILABLE_MB=$MIN_MEM_AVAILABLE_MB"
-  exit 75
-fi
+for i in $(seq 1 30); do
+  load_1m="$(awk '{print $1}' /proc/loadavg)"
+  mem_available_mb="$(free -m | awk '/Mem:/ {print $7}')"
+
+  load_ok=true
+  mem_ok=true
+  if awk -v current_load="$load_1m" -v max="$MAX_LOAD_1M" 'BEGIN { exit !(current_load > max) }'; then
+    load_ok=false
+  fi
+  if [ "$mem_available_mb" -lt "$MIN_MEM_AVAILABLE_MB" ]; then
+    mem_ok=false
+  fi
+
+  if [ "$load_ok" = true ] && [ "$mem_ok" = true ]; then
+    echo "Resource guard OK: load_1m=$load_1m mem_available_mb=$mem_available_mb"
+    break
+  fi
+
+  if [ "$i" -eq 30 ]; then
+    echo "Refusing deploy after wait: load_1m=$load_1m max=$MAX_LOAD_1M mem_available_mb=$mem_available_mb min=$MIN_MEM_AVAILABLE_MB"
+    exit 75
+  fi
+
+  echo "Resource busy, waiting before deploy ($i/30): load_1m=$load_1m max=$MAX_LOAD_1M mem_available_mb=$mem_available_mb min=$MIN_MEM_AVAILABLE_MB"
+  sleep 20
+done
 
 if [ ! -f "$ENV_FILE" ]; then
   echo "Missing $ENV_FILE. Create it on server first."
