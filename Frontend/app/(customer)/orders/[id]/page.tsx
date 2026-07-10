@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { api, ApiException } from "@/lib/api";
 import { formatPrice, formatBillingCycle } from "@/lib/formatters";
-import { PaymentStep } from "@/features/checkout/components/payment-step";
+import { DemoPayment } from "@/features/checkout/components/demo-payment";
 import { RevealOnScroll } from "@/components/landing/reveal-on-scroll";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -77,11 +77,6 @@ interface OrderDetail {
   timeline: TimelineEvent[];
   created_at: string;
   updated_at: string;
-}
-
-interface PayResponse {
-  snap_token: string;
-  redirect_url?: string;
 }
 
 // ─── Status badge config ────────────────────────────────────────────────────
@@ -179,10 +174,9 @@ export default function OrderDetailPage() {
   const orderId = params.id;
 
   const [order, setOrder] = useState<OrderDetail | null>(null);
-  const [snapToken, setSnapToken] = useState<string | null>(null);
+  const [showDemoPay, setShowDemoPay] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [payLoading, setPayLoading] = useState(false);
 
   // ── Fetch order ─────────────────────────────────────────────────────────
   useEffect(() => {
@@ -215,34 +209,29 @@ export default function OrderDetailPage() {
   }, [orderId]);
 
   // ── Pay handler ─────────────────────────────────────────────────────────
-  const handlePay = useCallback(async () => {
-    if (!order) return;
-    setPayLoading(true);
-    try {
-      const data = await api.post<PayResponse>(
-        `/api/v1/orders/${order.public_id}/pay`,
-      );
-      setSnapToken(data.snap_token);
-    } catch (err) {
-      setError(
-        err instanceof ApiException
-          ? err.message
-          : "Gagal memulai pembayaran.",
-      );
-    } finally {
-      setPayLoading(false);
-    }
-  }, [order]);
+  // Demo mode: show the DemoPayment component instead of calling the
+  // Midtrans /pay endpoint (unavailable in this portfolio build).
+  const handlePay = useCallback(() => {
+    setShowDemoPay(true);
+  }, []);
 
   // ── Payment success ─────────────────────────────────────────────────────
+  // Demo mode: optimistically mark the order as paid locally so the UI
+  // reflects the payment without a backend round-trip.
   const handlePaymentSuccess = useCallback(() => {
-    // Refresh order data
-    if (order) {
-      api
-        .get<OrderDetail>(`/api/v1/orders/${order.public_id}`)
-        .then(setOrder);
-    }
-  }, [order]);
+    setOrder((prev) =>
+      prev
+        ? {
+            ...prev,
+            status: "paid",
+            invoice: prev.invoice
+              ? { ...prev.invoice, status: "paid", paid_at: new Date().toISOString() }
+              : prev.invoice,
+          }
+        : prev,
+    );
+    setShowDemoPay(false);
+  }, []);
 
   // ── Loading skeleton ────────────────────────────────────────────────────
   if (loading) {
@@ -479,43 +468,35 @@ export default function OrderDetailPage() {
           Pembayaran
         </h2>
 
-        {canPay && !snapToken && (
+        {canPay && !showDemoPay && (
           <div className="flex flex-col items-center gap-4 py-4">
             <p className="text-sm text-[var(--color-fg-muted)]">
-              Order ini belum dibayar. Klik tombol di bawah untuk membayar via Midtrans Snap.
+              Order ini belum dibayar. Klik tombol di bawah untuk membayar.
             </p>
             <button
               type="button"
               onClick={handlePay}
-              disabled={payLoading}
-              className="inline-flex items-center rounded-full bg-[var(--color-accent)] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] shadow-[0_0_20px_var(--color-accent-soft)] transition-all hover:shadow-[0_0_30px_rgba(198,242,74,0.4)] disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center rounded-full bg-[var(--color-accent)] px-6 py-2.5 text-sm font-semibold text-[var(--color-accent-fg)] transition-all hover:brightness-110"
             >
-              {payLoading ? (
-                <>
-                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-[#0D0B00]/20 border-t-[#0D0B00]" />
-                  Memproses...
-                </>
-              ) : (
-                "Bayar Sekarang"
-              )}
+              Bayar Sekarang
             </button>
           </div>
         )}
 
-        {snapToken && (
-          <PaymentStep
-            snapToken={snapToken}
+        {showDemoPay && (
+          <DemoPayment
             orderId={order.public_id}
+            total={order.total}
+            currency={order.currency}
             onSuccess={handlePaymentSuccess}
             onPending={() => {
               router.push(`/orders/${order.public_id}`);
             }}
             onError={() => {}}
-            onClose={() => {}}
           />
         )}
 
-        {!canPay && !snapToken && (
+        {!canPay && !showDemoPay && (
           <div className="text-sm text-[var(--color-fg-muted)]">
             {order.status === "paid" || order.status === "completed"
               ? "Pembayaran telah diterima."
