@@ -184,10 +184,10 @@ export default function OrderDetailPage() {
 
     async function fetchOrder() {
       try {
-        const data = await api.get<OrderDetail>(
+        const res = await api.get<{ order: OrderDetail }>(
           `/api/v1/orders/${orderId}`,
         );
-        if (!cancelled) setOrder(data);
+        if (!cancelled) setOrder(res.order);
       } catch (err) {
         if (cancelled) return;
         if (err instanceof ApiException && err.status === 404) {

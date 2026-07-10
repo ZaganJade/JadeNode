@@ -99,10 +99,10 @@ export default function InvoiceDetailPage() {
 
     async function fetchInvoice() {
       try {
-        const data = await api.get<InvoiceDetail>(
+        const res = await api.get<{ invoice: InvoiceDetail }>(
           `/api/v1/invoices/${invoiceId}`,
         );
-        if (!cancelled) setInvoice(data);
+        if (!cancelled) setInvoice(res.invoice);
       } catch (err) {
         if (cancelled) return;
         if (err instanceof ApiException && err.status === 404) {
