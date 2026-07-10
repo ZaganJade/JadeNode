@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api, ApiException } from "@/lib/api";
+import { RevealOnScroll } from "@/components/landing/reveal-on-scroll";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -35,38 +36,38 @@ interface TicketsResponse {
 const statusConfig: Record<TicketStatus, { label: string; style: string }> = {
   open: {
     label: "Open",
-    style: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+    style: "bg-[var(--color-amber)]/10 text-[var(--color-amber)] border-[var(--color-amber)]/20",
   },
   in_progress: {
     label: "Diproses",
-    style: "bg-info-500/10 text-info-400 border-info-500/20",
+    style: "bg-[var(--color-steel)]/10 text-[var(--color-steel)] border-[var(--color-steel)]/20",
   },
   resolved: {
     label: "Terselesaikan",
-    style: "bg-success-500/10 text-success-400 border-success-500/20",
+    style: "bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]/20",
   },
   closed: {
     label: "Ditutup",
-    style: "bg-neutral-500/10 text-neutral-400 border-neutral-500/20",
+    style: "bg-[var(--color-surface-3)] text-[var(--color-fg-dim)] border-[var(--color-line)]",
   },
 };
 
 const priorityConfig: Record<TicketPriority, { label: string; style: string }> = {
   low: {
     label: "Low",
-    style: "bg-neutral-500/10 text-neutral-400 border-neutral-500/20",
+    style: "bg-[var(--color-surface-3)] text-[var(--color-fg-dim)] border-[var(--color-line)]",
   },
   medium: {
     label: "Medium",
-    style: "bg-info-500/10 text-info-400 border-info-500/20",
+    style: "bg-[var(--color-steel)]/10 text-[var(--color-steel)] border-[var(--color-steel)]/20",
   },
   high: {
     label: "High",
-    style: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+    style: "bg-[var(--color-amber)]/10 text-[var(--color-amber)] border-[var(--color-amber)]/20",
   },
   urgent: {
     label: "Urgent",
-    style: "bg-error-500/10 text-error-400 border-error-500/20",
+    style: "bg-[var(--color-error)]/10 text-[var(--color-error)] border-[var(--color-error)]/20",
   },
 };
 
@@ -117,63 +118,73 @@ export default function TicketsPage() {
   // ── Loading skeleton ────────────────────────────────────────────────────
   if (loading) {
     return (
+      <RevealOnScroll>
+        <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <div className="h-8 w-48 animate-pulse rounded bg-[rgba(255,191,0,0.08)]" />
-            <div className="mt-2 h-4 w-72 animate-pulse rounded bg-[rgba(255,191,0,0.05)]" />
+            <div className="h-8 w-48 animate-pulse rounded bg-[var(--color-accent-soft)]" />
+            <div className="mt-2 h-4 w-72 animate-pulse rounded bg-[var(--color-surface-2)]" />
           </div>
-          <div className="h-10 w-36 animate-pulse rounded-full bg-[rgba(255,191,0,0.08)]" />
+          <div className="h-10 w-36 animate-pulse rounded-full bg-[var(--color-accent-soft)]" />
         </div>
-        <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-6 backdrop-blur-[24px]">
+        <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 backdrop-blur-[24px]">
           <div className="space-y-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
-                className="h-16 animate-pulse rounded-lg bg-[rgba(255,191,0,0.04)]"
+                className="h-16 animate-pulse rounded-lg bg-[var(--color-surface-2)]"
               />
             ))}
           </div>
         </div>
       </div>
-    );
+        </div>
+      </RevealOnScroll>
+        );
   }
 
   // ── Error ───────────────────────────────────────────────────────────────
   if (error) {
     return (
+      <RevealOnScroll>
+        <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-[#F5F5F0]">Support</h1>
+          <h1 className="text-[32px] font-bold leading-none tracking-tight text-[var(--color-fg)]">Support</h1>
         </div>
-        <div className="rounded-2xl border border-error-500/20 bg-error-500/5 p-8 backdrop-blur-[24px] text-center">
-          <p className="text-sm text-error-400">{error}</p>
+        <div className="rounded-2xl border border-[var(--color-error)]/20 bg-[var(--color-error)]/[0.05] p-8 backdrop-blur-[24px] text-center">
+          <p className="text-sm text-[var(--color-error)]">{error}</p>
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="mt-4 rounded-full border border-[rgba(255,191,0,0.12)] bg-[rgba(25,20,0,0.6)] px-6 py-2.5 text-sm font-medium text-[#F5F5F0]/60 transition-colors hover:border-[rgba(255,191,0,0.3)] hover:text-[#F5F5F0]"
+            className="mt-4 rounded-full border border-[var(--color-line)] bg-[var(--color-surface-2)] px-6 py-2.5 text-sm font-medium text-[var(--color-fg-muted)] transition-colors hover:border-[var(--color-accent)]/30 hover:text-[var(--color-fg)]"
           >
             Coba Lagi
           </button>
         </div>
       </div>
-    );
+        </div>
+      </RevealOnScroll>
+        );
   }
 
   // ── Main render ─────────────────────────────────────────────────────────
   return (
+    <RevealOnScroll>
+      <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#F5F5F0]">Support</h1>
-          <p className="mt-1 text-sm text-[#F5F5F0]/50">
+          <h1 className="text-[32px] font-bold leading-none tracking-tight text-[var(--color-fg)]">Support</h1>
+          <p className="mt-2 text-sm text-[var(--color-fg-muted)]">
             Kelola tiket bantuan Anda.
           </p>
         </div>
         <Link
           href="/tickets/new"
-          className="inline-flex items-center rounded-full bg-[#FFBF00] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] shadow-[0_0_20px_rgba(255,191,0,0.25)] transition-all hover:shadow-[0_0_30px_rgba(255,191,0,0.4)]"
+          className="inline-flex items-center rounded-full bg-[var(--color-accent)] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] shadow-[0_0_20px_var(--color-accent-soft)] transition-all hover:shadow-[0_0_30px_rgba(198,242,74,0.4)]"
         >
           <svg
             className="mr-2 h-4 w-4"
@@ -194,10 +205,10 @@ export default function TicketsPage() {
 
       {/* Empty state */}
       {tickets.length === 0 && (
-        <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-12 backdrop-blur-[24px] text-center">
-          <div className="flex h-16 w-16 mx-auto items-center justify-center rounded-full bg-[rgba(255,191,0,0.06)]">
+        <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-12 backdrop-blur-[24px] text-center">
+          <div className="flex h-16 w-16 mx-auto items-center justify-center rounded-full bg-[var(--color-accent-soft)]">
             <svg
-              className="h-8 w-8 text-[#FFBF00]/40"
+              className="h-8 w-8 text-[var(--color-accent)]/40"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -210,16 +221,16 @@ export default function TicketsPage() {
               />
             </svg>
           </div>
-          <h3 className="mt-4 text-lg font-semibold text-[#F5F5F0]">
+          <h3 className="mt-4 text-lg font-semibold text-[var(--color-fg)]">
             Belum Ada Tiket
           </h3>
-          <p className="mt-2 text-sm text-[#F5F5F0]/40">
+          <p className="mt-2 text-sm text-[var(--color-fg-dim)]">
             Jika Anda membutuhkan bantuan, buat tiket baru dan tim kami akan
             segera membantu.
           </p>
           <Link
             href="/tickets/new"
-            className="mt-6 inline-flex items-center rounded-full bg-[#FFBF00] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] shadow-[0_0_20px_rgba(255,191,0,0.25)]"
+            className="mt-6 inline-flex items-center rounded-full bg-[var(--color-accent)] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] shadow-[0_0_20px_var(--color-accent-soft)]"
           >
             Buat Tiket Baru
           </Link>
@@ -233,12 +244,12 @@ export default function TicketsPage() {
             const status = statusConfig[ticket.status] ?? {
               label: ticket.status,
               style:
-                "bg-neutral-500/10 text-neutral-400 border-neutral-500/20",
+                "bg-[var(--color-surface-3)] text-[var(--color-fg-dim)] border-[var(--color-line)]",
             };
             const priority = priorityConfig[ticket.priority] ?? {
               label: ticket.priority,
               style:
-                "bg-neutral-500/10 text-neutral-400 border-neutral-500/20",
+                "bg-[var(--color-surface-3)] text-[var(--color-fg-dim)] border-[var(--color-line)]",
             };
 
             return (
@@ -247,7 +258,7 @@ export default function TicketsPage() {
                 href={`/tickets/${ticket.public_id}`}
                 className="group block"
               >
-                <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-6 backdrop-blur-[24px] transition-colors hover:border-[rgba(255,191,0,0.18)]">
+                <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 backdrop-blur-[24px] transition-colors hover:border-[var(--color-accent-soft)]">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     {/* Left: ticket info */}
                     <div className="flex-1 min-w-0">
@@ -264,11 +275,11 @@ export default function TicketsPage() {
                         </span>
                       </div>
 
-                      <h3 className="mt-2 text-sm font-semibold text-[#F5F5F0] truncate">
+                      <h3 className="mt-2 text-sm font-semibold text-[var(--color-fg)] truncate">
                         {ticket.subject}
                       </h3>
 
-                      <div className="mt-1 flex items-center gap-3 text-xs text-[#F5F5F0]/40">
+                      <div className="mt-1 flex items-center gap-3 text-xs text-[var(--color-fg-dim)]">
                         <span>{formatDate(ticket.created_at)}</span>
                         <span>•</span>
                         <span>{ticket.messages_count} pesan</span>
@@ -278,15 +289,15 @@ export default function TicketsPage() {
                     {/* Right: last reply + arrow */}
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <p className="text-[10px] text-[#F5F5F0]/30 uppercase tracking-wider">
+                        <p className="text-[10px] text-[var(--color-fg-dim)] uppercase tracking-wider">
                           Balasan Terakhir
                         </p>
-                        <p className="text-xs text-[#F5F5F0]/50">
+                        <p className="text-xs text-[var(--color-fg-muted)]">
                           {formatDate(ticket.last_reply_at)}
                         </p>
                       </div>
                       <svg
-                        className="h-4 w-4 text-[#F5F5F0]/20 transition-transform group-hover:translate-x-1 group-hover:text-[#FFBF00]/60"
+                        className="h-4 w-4 text-[var(--color-fg)]/20 transition-transform group-hover:translate-x-1 group-hover:text-[var(--color-accent)]/60"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -307,5 +318,7 @@ export default function TicketsPage() {
         </div>
       )}
     </div>
-  );
+      </div>
+    </RevealOnScroll>
+    );
 }

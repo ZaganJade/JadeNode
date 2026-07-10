@@ -9,6 +9,7 @@ import { DeploymentStatusTimeline } from "@/features/deployments/components/depl
 import { CredentialReveal } from "@/features/deployments/components/credential-reveal";
 import { SshKeyManager } from "@/features/deployments/components/ssh-key-manager";
 import type { DeploymentState } from "@/features/deployments/components/deployment-status-timeline";
+import { RevealOnScroll } from "@/components/landing/reveal-on-scroll";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -62,7 +63,7 @@ const statusConfig: Record<
   },
   provisioning: {
     label: "Provisioning",
-    color: "#FFBF00",
+    color: "var(--color-accent)",
     bg: "rgba(255, 191, 0, 0.10)",
     border: "rgba(255, 191, 0, 0.20)",
   },
@@ -240,25 +241,31 @@ export default function DeploymentDetailPage() {
   // ── Loading skeleton ────────────────────────────────────────────────────
   if (loading) {
     return (
+      <RevealOnScroll>
+        <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 animate-pulse rounded bg-[rgba(255,191,0,0.08)]" />
-          <div className="h-8 w-64 animate-pulse rounded bg-[rgba(255,191,0,0.08)]" />
+          <div className="h-8 w-8 animate-pulse rounded bg-[var(--color-accent-soft)]" />
+          <div className="h-8 w-64 animate-pulse rounded bg-[var(--color-accent-soft)]" />
         </div>
-        <div className="h-[120px] animate-pulse rounded-2xl bg-[rgba(255,191,0,0.06)]" />
-        <div className="h-[80px] animate-pulse rounded-2xl bg-[rgba(255,191,0,0.04)]" />
-        <div className="h-[150px] animate-pulse rounded-2xl bg-[rgba(255,191,0,0.06)]" />
+        <div className="h-[120px] animate-pulse rounded-2xl bg-[var(--color-accent-soft)]" />
+        <div className="h-[80px] animate-pulse rounded-2xl bg-[var(--color-surface-2)]" />
+        <div className="h-[150px] animate-pulse rounded-2xl bg-[var(--color-accent-soft)]" />
       </div>
-    );
+        </div>
+      </RevealOnScroll>
+        );
   }
 
   // ── Error ───────────────────────────────────────────────────────────────
   if (error || !deployment) {
     return (
+      <RevealOnScroll>
+        <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
       <div className="space-y-6">
         <Link
           href="/deployments"
-          className="inline-flex items-center gap-1 text-sm text-[#FFBF00]/60 transition-colors hover:text-[#FFBF00]"
+          className="inline-flex items-center gap-1 text-sm text-[var(--color-accent)]/60 transition-colors hover:text-[var(--color-accent)]"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -266,19 +273,21 @@ export default function DeploymentDetailPage() {
           Kembali ke Deployments
         </Link>
         <div className="rounded-2xl border border-[#ffb5ab]/20 bg-[#ffb5ab]/5 p-8 backdrop-blur-[24px] text-center">
-          <h2 className="text-lg font-semibold text-[#F5F5F0]">
+          <h2 className="text-lg font-semibold text-[var(--color-fg)]">
             {error ?? "Gagal memuat detail deployment."}
           </h2>
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="mt-4 rounded-full border border-[rgba(255,191,0,0.12)] bg-[rgba(25,20,0,0.6)] px-6 py-2.5 text-sm font-medium text-[#F5F5F0]/60 transition-colors hover:border-[rgba(255,191,0,0.3)] hover:text-[#F5F5F0]"
+            className="mt-4 rounded-full border border-[var(--color-line)] bg-[var(--color-surface-2)] px-6 py-2.5 text-sm font-medium text-[var(--color-fg-muted)] transition-colors hover:border-[var(--color-accent)]/30 hover:text-[var(--color-fg)]"
           >
             Coba Lagi
           </button>
         </div>
       </div>
-    );
+        </div>
+      </RevealOnScroll>
+        );
   }
 
   const status = statusConfig[deployment.status] ?? statusConfig.pending_provisioning;
@@ -288,11 +297,13 @@ export default function DeploymentDetailPage() {
 
   // ── Render ──────────────────────────────────────────────────────────────
   return (
+    <RevealOnScroll>
+      <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
     <div className="space-y-6">
       {/* Back link */}
       <Link
         href="/deployments"
-        className="inline-flex items-center gap-1 text-sm text-[#FFBF00]/60 transition-colors hover:text-[#FFBF00]"
+        className="inline-flex items-center gap-1 text-sm text-[var(--color-accent)]/60 transition-colors hover:text-[var(--color-accent)]"
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -304,7 +315,7 @@ export default function DeploymentDetailPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-[#F5F5F0]">
+            <h1 className="text-[32px] font-bold leading-none tracking-tight text-[var(--color-fg)]">
               {deployment.product_name}
             </h1>
             <span
@@ -318,7 +329,7 @@ export default function DeploymentDetailPage() {
               {status.label}
             </span>
           </div>
-          <p className="mt-1 text-sm text-[#F5F5F0]/40">
+          <p className="mt-1 text-sm text-[var(--color-fg-dim)]">
             Deployment ID: <span className="font-mono">{deployment.public_id}</span>
           </p>
         </div>
@@ -331,7 +342,7 @@ export default function DeploymentDetailPage() {
                 type="button"
                 onClick={() => handleAction("stop")}
                 disabled={actionLoading !== null}
-                className="rounded-lg border border-[rgba(255,191,0,0.12)] bg-[rgba(25,20,0,0.6)] px-4 py-2 text-xs font-medium text-[#F5F5F0]/60 transition-colors hover:border-[rgba(255,191,0,0.3)] hover:text-[#F5F5F0] disabled:opacity-50"
+                className="rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-2)] px-4 py-2 text-xs font-medium text-[var(--color-fg-muted)] transition-colors hover:border-[var(--color-accent)]/30 hover:text-[var(--color-fg)] disabled:opacity-50"
               >
                 {actionLoading === "stop" ? "..." : "Stop"}
               </button>
@@ -350,7 +361,7 @@ export default function DeploymentDetailPage() {
               type="button"
               onClick={() => handleAction("restart")}
               disabled={actionLoading !== null}
-              className="rounded-lg border border-[rgba(255,191,0,0.12)] bg-[rgba(25,20,0,0.6)] px-4 py-2 text-xs font-medium text-[#FFBF00] transition-colors hover:bg-[rgba(255,191,0,0.08)] disabled:opacity-50"
+              className="rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-2)] px-4 py-2 text-xs font-medium text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent-soft)] disabled:opacity-50"
             >
               {actionLoading === "restart" ? "..." : "Restart"}
             </button>
@@ -373,20 +384,20 @@ export default function DeploymentDetailPage() {
 
       {/* ─── Specs ────────────────────────────────────────────────────────── */}
       {deployment.specs && deployment.specs.length > 0 && (
-        <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-6 backdrop-blur-[24px]">
-          <h3 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/60">
+        <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 backdrop-blur-[24px]">
+          <h3 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/60">
             Spesifikasi
           </h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {deployment.specs.map((spec) => (
               <div
                 key={spec.key}
-                className="rounded-lg border border-[rgba(255,191,0,0.06)] bg-[rgba(25,20,0,0.3)] px-4 py-3"
+                className="rounded-lg border border-[var(--color-surface-2)] bg-[rgba(25,20,0,0.3)] px-4 py-3"
               >
-                <p className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/50">
+                <p className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/50">
                   {specIconMap[spec.key] ?? spec.label ?? spec.key}
                 </p>
-                <p className="mt-1 text-sm font-medium text-[#F5F5F0]">
+                <p className="mt-1 text-sm font-medium text-[var(--color-fg)]">
                   {spec.value}
                 </p>
               </div>
@@ -397,30 +408,30 @@ export default function DeploymentDetailPage() {
 
       {/* ─── Access ───────────────────────────────────────────────────────── */}
       <div className="space-y-4">
-        <h3 className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/60">
+        <h3 className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/60">
           Akses
         </h3>
 
         {/* IP/Hostname */}
         {(deployment.ip_address || deployment.hostname) && (
-          <div className="rounded-xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-4 backdrop-blur-[24px]">
+          <div className="rounded-xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-4 backdrop-blur-[24px]">
             <div className="grid gap-4 sm:grid-cols-2">
               {deployment.ip_address && (
                 <div>
-                  <p className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/50">
+                  <p className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/50">
                     IP Address
                   </p>
-                  <p className="mt-1 font-mono text-sm text-[#F5F5F0]">
+                  <p className="mt-1 font-mono text-sm text-[var(--color-fg)]">
                     {deployment.ip_address}
                   </p>
                 </div>
               )}
               {deployment.hostname && (
                 <div>
-                  <p className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/50">
+                  <p className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/50">
                     Hostname
                   </p>
-                  <p className="mt-1 font-mono text-sm text-[#F5F5F0]">
+                  <p className="mt-1 font-mono text-sm text-[var(--color-fg)]">
                     {deployment.hostname}
                   </p>
                 </div>
@@ -445,37 +456,37 @@ export default function DeploymentDetailPage() {
       </div>
 
       {/* ─── Billing ─────────────────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-6 backdrop-blur-[24px]">
-        <h3 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/60">
+      <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 backdrop-blur-[24px]">
+        <h3 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/60">
           Billing
         </h3>
 
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-[#F5F5F0]/50">Siklus</span>
-            <span className="text-[#F5F5F0]">
+            <span className="text-[var(--color-fg-muted)]">Siklus</span>
+            <span className="text-[var(--color-fg)]">
               {formatBillingCycle(deployment.billing_cycle)}
             </span>
           </div>
 
           {deployment.period_start && deployment.period_end && (
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[#F5F5F0]/50">Periode</span>
-              <span className="text-[#F5F5F0]">
+              <span className="text-[var(--color-fg-muted)]">Periode</span>
+              <span className="text-[var(--color-fg)]">
                 {formatShortDate(deployment.period_start)} — {formatShortDate(deployment.period_end)}
               </span>
             </div>
           )}
 
           <div className="flex items-center justify-between text-sm">
-            <span className="text-[#F5F5F0]/50">Auto-renewal</span>
+            <span className="text-[var(--color-fg-muted)]">Auto-renewal</span>
             <span
               className={
                 deployment.cancel_at_period_end
                   ? "text-[#ffb5ab]"
                   : deployment.auto_renew
                     ? "text-[#4be277]"
-                    : "text-[#F5F5F0]/40"
+                    : "text-[var(--color-fg-dim)]"
               }
             >
               {deployment.cancel_at_period_end
@@ -487,14 +498,14 @@ export default function DeploymentDetailPage() {
           </div>
 
           <div className="flex items-center justify-between text-sm">
-            <span className="text-[#F5F5F0]/50">Dibuat</span>
-            <span className="text-[#F5F5F0]">{formatDate(deployment.created_at)}</span>
+            <span className="text-[var(--color-fg-muted)]">Dibuat</span>
+            <span className="text-[var(--color-fg)]">{formatDate(deployment.created_at)}</span>
           </div>
         </div>
 
         {/* Cancel at period end */}
         {isActive && !deployment.cancel_at_period_end && (
-          <div className="mt-4 border-t border-[rgba(255,191,0,0.06)] pt-4">
+          <div className="mt-4 border-t border-[var(--color-surface-2)] pt-4">
             {cancelConfirm ? (
               <div className="space-y-3">
                 <p className="text-xs text-[#ffb5ab]">
@@ -512,7 +523,7 @@ export default function DeploymentDetailPage() {
                   <button
                     type="button"
                     onClick={() => setCancelConfirm(false)}
-                    className="rounded-lg border border-[rgba(255,191,0,0.12)] bg-[rgba(25,20,0,0.6)] px-4 py-2 text-xs font-medium text-[#F5F5F0]/60 transition-colors hover:text-[#F5F5F0]"
+                    className="rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-2)] px-4 py-2 text-xs font-medium text-[var(--color-fg-muted)] transition-colors hover:text-[var(--color-fg)]"
                   >
                     Kembali
                   </button>
@@ -522,7 +533,7 @@ export default function DeploymentDetailPage() {
               <button
                 type="button"
                 onClick={() => setCancelConfirm(true)}
-                className="text-xs text-[#F5F5F0]/30 transition-colors hover:text-[#ffb5ab]"
+                className="text-xs text-[var(--color-fg-dim)] transition-colors hover:text-[#ffb5ab]"
               >
                 Batalkan di Akhir Periode
               </button>
@@ -531,5 +542,7 @@ export default function DeploymentDetailPage() {
         )}
       </div>
     </div>
-  );
+      </div>
+    </RevealOnScroll>
+    );
 }

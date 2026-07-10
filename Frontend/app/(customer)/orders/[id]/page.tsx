@@ -6,6 +6,7 @@ import Link from "next/link";
 import { api, ApiException } from "@/lib/api";
 import { formatPrice, formatBillingCycle } from "@/lib/formatters";
 import { PaymentStep } from "@/features/checkout/components/payment-step";
+import { RevealOnScroll } from "@/components/landing/reveal-on-scroll";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -91,27 +92,27 @@ const orderStatusConfig: Record<
 > = {
   pending_payment: {
     label: "Menunggu Pembayaran",
-    style: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+    style: "bg-[var(--color-amber)]/10 text-[var(--color-amber)] border-[var(--color-amber)]/20",
   },
   paid: {
     label: "Dibayar",
-    style: "bg-success-500/10 text-success-400 border-success-500/20",
+    style: "bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]/20",
   },
   processing: {
     label: "Diproses",
-    style: "bg-info-500/10 text-info-400 border-info-500/20",
+    style: "bg-[var(--color-steel)]/10 text-[var(--color-steel)] border-[var(--color-steel)]/20",
   },
   completed: {
     label: "Selesai",
-    style: "bg-success-500/10 text-success-400 border-success-500/20",
+    style: "bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]/20",
   },
   cancelled: {
     label: "Dibatalkan",
-    style: "bg-error-500/10 text-error-400 border-error-500/20",
+    style: "bg-[var(--color-error)]/10 text-[var(--color-error)] border-[var(--color-error)]/20",
   },
   expired: {
     label: "Kadaluarsa",
-    style: "bg-neutral-500/10 text-neutral-400 border-neutral-500/20",
+    style: "bg-[var(--color-surface-3)] text-[var(--color-fg-dim)] border-[var(--color-line)]",
   },
 };
 
@@ -121,19 +122,19 @@ const invoiceStatusConfig: Record<
 > = {
   pending: {
     label: "Menunggu",
-    style: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+    style: "bg-[var(--color-amber)]/10 text-[var(--color-amber)] border-[var(--color-amber)]/20",
   },
   paid: {
     label: "Dibayar",
-    style: "bg-success-500/10 text-success-400 border-success-500/20",
+    style: "bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]/20",
   },
   cancelled: {
     label: "Dibatalkan",
-    style: "bg-error-500/10 text-error-400 border-error-500/20",
+    style: "bg-[var(--color-error)]/10 text-[var(--color-error)] border-[var(--color-error)]/20",
   },
   void: {
     label: "Void",
-    style: "bg-neutral-500/10 text-neutral-400 border-neutral-500/20",
+    style: "bg-[var(--color-surface-3)] text-[var(--color-fg-dim)] border-[var(--color-line)]",
   },
 };
 
@@ -246,61 +247,71 @@ export default function OrderDetailPage() {
   // ── Loading skeleton ────────────────────────────────────────────────────
   if (loading) {
     return (
+      <RevealOnScroll>
+        <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 animate-pulse rounded bg-[rgba(255,191,0,0.08)]" />
-          <div className="h-8 w-64 animate-pulse rounded bg-[rgba(255,191,0,0.08)]" />
+          <div className="h-8 w-8 animate-pulse rounded bg-[var(--color-accent-soft)]" />
+          <div className="h-8 w-64 animate-pulse rounded bg-[var(--color-accent-soft)]" />
         </div>
-        <div className="h-[200px] animate-pulse rounded-2xl bg-[rgba(255,191,0,0.06)]" />
-        <div className="h-[150px] animate-pulse rounded-2xl bg-[rgba(255,191,0,0.04)]" />
-        <div className="h-[100px] animate-pulse rounded-2xl bg-[rgba(255,191,0,0.06)]" />
+        <div className="h-[200px] animate-pulse rounded-2xl bg-[var(--color-accent-soft)]" />
+        <div className="h-[150px] animate-pulse rounded-2xl bg-[var(--color-surface-2)]" />
+        <div className="h-[100px] animate-pulse rounded-2xl bg-[var(--color-accent-soft)]" />
       </div>
-    );
+        </div>
+      </RevealOnScroll>
+        );
   }
 
   // ── Error / not found ───────────────────────────────────────────────────
   if (error || !order) {
     return (
+      <RevealOnScroll>
+        <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
       <div className="space-y-6">
         <Link
           href="/orders"
-          className="inline-flex items-center gap-1 text-sm text-[#FFBF00]/60 transition-colors hover:text-[#FFBF00]"
+          className="inline-flex items-center gap-1 text-sm text-[var(--color-accent)]/60 transition-colors hover:text-[var(--color-accent)]"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
           </svg>
           Kembali ke Orders
         </Link>
-        <div className="rounded-2xl border border-error-500/20 bg-error-500/5 p-8 backdrop-blur-[24px] text-center">
-          <h2 className="text-lg font-semibold text-[#F5F5F0]">
+        <div className="rounded-2xl border border-[var(--color-error)]/20 bg-[var(--color-error)]/[0.05] p-8 backdrop-blur-[24px] text-center">
+          <h2 className="text-lg font-semibold text-[var(--color-fg)]">
             {error ?? "Gagal memuat detail order."}
           </h2>
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="mt-4 rounded-full border border-[rgba(255,191,0,0.12)] bg-[rgba(25,20,0,0.6)] px-6 py-2.5 text-sm font-medium text-[#F5F5F0]/60 transition-colors hover:border-[rgba(255,191,0,0.3)] hover:text-[#F5F5F0]"
+            className="mt-4 rounded-full border border-[var(--color-line)] bg-[var(--color-surface-2)] px-6 py-2.5 text-sm font-medium text-[var(--color-fg-muted)] transition-colors hover:border-[var(--color-accent)]/30 hover:text-[var(--color-fg)]"
           >
             Coba Lagi
           </button>
         </div>
       </div>
-    );
+        </div>
+      </RevealOnScroll>
+        );
   }
 
   const statusInfo = orderStatusConfig[order.status] ?? {
     label: order.status,
-    style: "bg-neutral-500/10 text-neutral-400 border-neutral-500/20",
+    style: "bg-[var(--color-surface-3)] text-[var(--color-fg-dim)] border-[var(--color-line)]",
   };
 
   const canPay = order.status === "pending_payment";
 
   // ── Render ──────────────────────────────────────────────────────────────
   return (
+    <RevealOnScroll>
+      <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
     <div className="space-y-6">
       {/* Back link */}
       <Link
         href="/orders"
-        className="inline-flex items-center gap-1 text-sm text-[#FFBF00]/60 transition-colors hover:text-[#FFBF00]"
+        className="inline-flex items-center gap-1 text-sm text-[var(--color-accent)]/60 transition-colors hover:text-[var(--color-accent)]"
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -312,7 +323,7 @@ export default function OrderDetailPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-[#F5F5F0]">
+            <h1 className="text-[32px] font-bold leading-none tracking-tight text-[var(--color-fg)]">
               Order #{order.order_number ?? order.public_id}
             </h1>
             <span
@@ -321,24 +332,24 @@ export default function OrderDetailPage() {
               {statusInfo.label}
             </span>
           </div>
-          <p className="mt-1 text-sm text-[#F5F5F0]/40">
+          <p className="mt-1 text-sm text-[var(--color-fg-dim)]">
             Dibuat pada {formatDate(order.created_at)}
           </p>
         </div>
 
         <div className="text-right">
-          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/50">
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/50">
             Total
           </p>
-          <p className="text-2xl font-bold text-[#FFBF00]">
+          <p className="text-2xl font-bold text-[var(--color-accent)]">
             {formatPrice(order.total, order.currency)}
           </p>
         </div>
       </div>
 
       {/* ─── Order Items ─────────────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-6 backdrop-blur-[24px]">
-        <h2 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/60">
+      <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 backdrop-blur-[24px]">
+        <h2 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/60">
           Item Order
         </h2>
 
@@ -347,10 +358,10 @@ export default function OrderDetailPage() {
             <div key={idx}>
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-sm font-semibold text-[#F5F5F0]">
+                  <h3 className="text-sm font-semibold text-[var(--color-fg)]">
                     {item.product_name}
                   </h3>
-                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[#F5F5F0]/40">
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--color-fg-dim)]">
                     <span>{formatBillingCycle(item.billing_cycle)}</span>
                     {item.region && (
                       <>
@@ -360,7 +371,7 @@ export default function OrderDetailPage() {
                     )}
                   </div>
                 </div>
-                <span className="text-sm font-medium text-[#F5F5F0]">
+                <span className="text-sm font-medium text-[var(--color-fg)]">
                   {formatPrice(item.subtotal, order.currency)}
                 </span>
               </div>
@@ -373,12 +384,12 @@ export default function OrderDetailPage() {
                     .map(([key, val]) => (
                       <div
                         key={key}
-                        className="rounded-lg border border-[rgba(255,191,0,0.06)] bg-[rgba(25,20,0,0.3)] px-3 py-2"
+                        className="rounded-lg border border-[var(--color-surface-2)] bg-[rgba(25,20,0,0.3)] px-3 py-2"
                       >
-                        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/50">
+                        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/50">
                           {specLabels[key] ?? key}
                         </p>
-                        <p className="text-xs font-medium text-[#F5F5F0]">
+                        <p className="text-xs font-medium text-[var(--color-fg)]">
                           {String(val)}
                         </p>
                       </div>
@@ -391,11 +402,11 @@ export default function OrderDetailPage() {
 
         {/* Provider */}
         {order.provider && (
-          <div className="mt-4 flex items-center gap-2 border-t border-[rgba(255,191,0,0.06)] pt-4">
-            <span className="text-xs text-[#F5F5F0]/40">Provider:</span>
-            <div className="flex items-center gap-1.5 text-xs text-[#F5F5F0]/70">
+          <div className="mt-4 flex items-center gap-2 border-t border-[var(--color-surface-2)] pt-4">
+            <span className="text-xs text-[var(--color-fg-dim)]">Provider:</span>
+            <div className="flex items-center gap-1.5 text-xs text-[var(--color-fg-muted)]">
               {order.provider.verified && (
-                <svg className="h-3 w-3 text-[#FFBF00]" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="h-3 w-3 text-[var(--color-accent)]" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
               )}
@@ -407,24 +418,24 @@ export default function OrderDetailPage() {
 
       {/* ─── Invoice Section ──────────────────────────────────────────────── */}
       {order.invoice && (
-        <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-6 backdrop-blur-[24px]">
-          <h2 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/60">
+        <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 backdrop-blur-[24px]">
+          <h2 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/60">
             Invoice
           </h2>
 
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[#F5F5F0]/50">Nomor Invoice</span>
+              <span className="text-[var(--color-fg-muted)]">Nomor Invoice</span>
               <Link
                 href={`/invoices/${order.invoice.public_id}`}
-                className="font-mono text-xs text-[#FFBF00] hover:underline"
+                className="font-mono text-xs text-[var(--color-accent)] hover:underline"
               >
                 {order.invoice.invoice_number ?? order.invoice.public_id}
               </Link>
             </div>
 
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[#F5F5F0]/50">Status</span>
+              <span className="text-[var(--color-fg-muted)]">Status</span>
               <span
                 className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider ${
                   (invoiceStatusConfig[order.invoice.status] ?? invoiceStatusConfig.pending).style
@@ -435,16 +446,16 @@ export default function OrderDetailPage() {
             </div>
 
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[#F5F5F0]/50">Total</span>
-              <span className="font-semibold text-[#FFBF00]">
+              <span className="text-[var(--color-fg-muted)]">Total</span>
+              <span className="font-semibold text-[var(--color-accent)]">
                 {formatPrice(order.invoice.total, order.invoice.currency)}
               </span>
             </div>
 
             {order.invoice.due_date && (
               <div className="flex items-center justify-between text-sm">
-                <span className="text-[#F5F5F0]/50">Jatuh Tempo</span>
-                <span className="text-[#F5F5F0]">
+                <span className="text-[var(--color-fg-muted)]">Jatuh Tempo</span>
+                <span className="text-[var(--color-fg)]">
                   {formatDate(order.invoice.due_date)}
                 </span>
               </div>
@@ -452,8 +463,8 @@ export default function OrderDetailPage() {
 
             {order.invoice.paid_at && (
               <div className="flex items-center justify-between text-sm">
-                <span className="text-[#F5F5F0]/50">Dibayar pada</span>
-                <span className="text-success-400">
+                <span className="text-[var(--color-fg-muted)]">Dibayar pada</span>
+                <span className="text-[var(--color-success)]">
                   {formatDate(order.invoice.paid_at)}
                 </span>
               </div>
@@ -463,21 +474,21 @@ export default function OrderDetailPage() {
       )}
 
       {/* ─── Payment Section ──────────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-6 backdrop-blur-[24px]">
-        <h2 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/60">
+      <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 backdrop-blur-[24px]">
+        <h2 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/60">
           Pembayaran
         </h2>
 
         {canPay && !snapToken && (
           <div className="flex flex-col items-center gap-4 py-4">
-            <p className="text-sm text-[#F5F5F0]/50">
+            <p className="text-sm text-[var(--color-fg-muted)]">
               Order ini belum dibayar. Klik tombol di bawah untuk membayar via Midtrans Snap.
             </p>
             <button
               type="button"
               onClick={handlePay}
               disabled={payLoading}
-              className="inline-flex items-center rounded-full bg-[#FFBF00] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] shadow-[0_0_20px_rgba(255,191,0,0.25)] transition-all hover:shadow-[0_0_30px_rgba(255,191,0,0.4)] disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center rounded-full bg-[var(--color-accent)] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] shadow-[0_0_20px_var(--color-accent-soft)] transition-all hover:shadow-[0_0_30px_rgba(198,242,74,0.4)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {payLoading ? (
                 <>
@@ -505,7 +516,7 @@ export default function OrderDetailPage() {
         )}
 
         {!canPay && !snapToken && (
-          <div className="text-sm text-[#F5F5F0]/50">
+          <div className="text-sm text-[var(--color-fg-muted)]">
             {order.status === "paid" || order.status === "completed"
               ? "Pembayaran telah diterima."
               : order.status === "cancelled"
@@ -518,8 +529,8 @@ export default function OrderDetailPage() {
 
         {/* Payment history */}
         {order.payments && order.payments.length > 0 && (
-          <div className="mt-4 border-t border-[rgba(255,191,0,0.06)] pt-4">
-            <h3 className="mb-3 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/50">
+          <div className="mt-4 border-t border-[var(--color-surface-2)] pt-4">
+            <h3 className="mb-3 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/50">
               Riwayat Pembayaran
             </h3>
             <div className="space-y-2">
@@ -529,24 +540,24 @@ export default function OrderDetailPage() {
                   className="flex items-center justify-between rounded-lg bg-[rgba(25,20,0,0.3)] px-4 py-3 text-sm"
                 >
                   <div>
-                    <span className="text-[#F5F5F0]/70">
+                    <span className="text-[var(--color-fg-muted)]">
                       {payment.method ?? "Midtrans Snap"}
                     </span>
-                    <span className="ml-2 text-xs text-[#F5F5F0]/40">
+                    <span className="ml-2 text-xs text-[var(--color-fg-dim)]">
                       {formatDate(payment.created_at)}
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-[#F5F5F0]">
+                    <span className="text-[var(--color-fg)]">
                       {formatPrice(payment.amount, payment.currency)}
                     </span>
                     <span
                       className={`rounded-full border px-2 py-0.5 text-[10px] uppercase ${
                         payment.status === "paid"
-                          ? "border-success-500/20 bg-success-500/10 text-success-400"
+                          ? "border-[var(--color-success)]/20 bg-[var(--color-success)]/10 text-[var(--color-success)]"
                           : payment.status === "pending"
-                            ? "border-amber-500/20 bg-amber-500/10 text-amber-400"
-                            : "border-error-500/20 bg-error-500/10 text-error-400"
+                            ? "border-[var(--color-amber)]/20 bg-[var(--color-amber)]/10 text-[var(--color-amber)]"
+                            : "border-[var(--color-error)]/20 bg-[var(--color-error)]/10 text-[var(--color-error)]"
                       }`}
                     >
                       {payment.status}
@@ -561,8 +572,8 @@ export default function OrderDetailPage() {
 
       {/* ─── Timeline ─────────────────────────────────────────────────────── */}
       {order.timeline && order.timeline.length > 0 && (
-        <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-6 backdrop-blur-[24px]">
-          <h2 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/60">
+        <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 backdrop-blur-[24px]">
+          <h2 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/60">
             Timeline
           </h2>
 
@@ -574,12 +585,12 @@ export default function OrderDetailPage() {
                   <div
                     className={`h-3 w-3 rounded-full border-2 ${
                       event.timestamp
-                        ? "border-[#FFBF00] bg-[#FFBF00]/20"
-                        : "border-[rgba(255,191,0,0.2)] bg-transparent"
+                        ? "border-[var(--color-accent)] bg-[var(--color-accent)]/20"
+                        : "border-[var(--color-accent-soft)] bg-transparent"
                     }`}
                   />
                   {idx < order.timeline.length - 1 && (
-                    <div className="h-8 w-px bg-[rgba(255,191,0,0.1)]" />
+                    <div className="h-8 w-px bg-[var(--color-accent)]/10" />
                   )}
                 </div>
 
@@ -587,18 +598,18 @@ export default function OrderDetailPage() {
                 <div className="pb-6">
                   <p
                     className={`text-sm font-medium ${
-                      event.timestamp ? "text-[#F5F5F0]" : "text-[#F5F5F0]/40"
+                      event.timestamp ? "text-[var(--color-fg)]" : "text-[var(--color-fg-dim)]"
                     }`}
                   >
                     {event.label}
                   </p>
                   {event.timestamp && (
-                    <p className="mt-0.5 text-xs text-[#F5F5F0]/30">
+                    <p className="mt-0.5 text-xs text-[var(--color-fg-dim)]">
                       {formatDate(event.timestamp)}
                     </p>
                   )}
                   {event.description && (
-                    <p className="mt-1 text-xs text-[#F5F5F0]/40">
+                    <p className="mt-1 text-xs text-[var(--color-fg-dim)]">
                       {event.description}
                     </p>
                   )}
@@ -609,5 +620,7 @@ export default function OrderDetailPage() {
         </div>
       )}
     </div>
-  );
+      </div>
+    </RevealOnScroll>
+    );
 }

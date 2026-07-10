@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { api, ApiException } from "@/lib/api";
 import { formatPrice } from "@/lib/formatters";
+import { RevealOnScroll } from "@/components/landing/reveal-on-scroll";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -50,19 +51,19 @@ const statusConfig: Record<
 > = {
   pending: {
     label: "Menunggu",
-    style: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+    style: "bg-[var(--color-amber)]/10 text-[var(--color-amber)] border-[var(--color-amber)]/20",
   },
   paid: {
     label: "Dibayar",
-    style: "bg-success-500/10 text-success-400 border-success-500/20",
+    style: "bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]/20",
   },
   cancelled: {
     label: "Dibatalkan",
-    style: "bg-error-500/10 text-error-400 border-error-500/20",
+    style: "bg-[var(--color-error)]/10 text-[var(--color-error)] border-[var(--color-error)]/20",
   },
   void: {
     label: "Void",
-    style: "bg-neutral-500/10 text-neutral-400 border-neutral-500/20",
+    style: "bg-[var(--color-surface-3)] text-[var(--color-fg-dim)] border-[var(--color-line)]",
   },
 };
 
@@ -127,44 +128,52 @@ export default function InvoiceDetailPage() {
   // ── Loading skeleton ────────────────────────────────────────────────────
   if (loading) {
     return (
+      <RevealOnScroll>
+        <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 animate-pulse rounded bg-[rgba(255,191,0,0.08)]" />
-          <div className="h-8 w-48 animate-pulse rounded bg-[rgba(255,191,0,0.08)]" />
+          <div className="h-8 w-8 animate-pulse rounded bg-[var(--color-accent-soft)]" />
+          <div className="h-8 w-48 animate-pulse rounded bg-[var(--color-accent-soft)]" />
         </div>
-        <div className="h-[250px] animate-pulse rounded-2xl bg-[rgba(255,191,0,0.06)]" />
-        <div className="h-[100px] animate-pulse rounded-2xl bg-[rgba(255,191,0,0.04)]" />
+        <div className="h-[250px] animate-pulse rounded-2xl bg-[var(--color-accent-soft)]" />
+        <div className="h-[100px] animate-pulse rounded-2xl bg-[var(--color-surface-2)]" />
       </div>
-    );
+        </div>
+      </RevealOnScroll>
+        );
   }
 
   // ── Error / not found ───────────────────────────────────────────────────
   if (error || !invoice) {
     return (
+      <RevealOnScroll>
+        <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
       <div className="space-y-6">
         <Link
           href="/invoices"
-          className="inline-flex items-center gap-1 text-sm text-[#FFBF00]/60 transition-colors hover:text-[#FFBF00]"
+          className="inline-flex items-center gap-1 text-sm text-[var(--color-accent)]/60 transition-colors hover:text-[var(--color-accent)]"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
           </svg>
           Kembali ke Invoices
         </Link>
-        <div className="rounded-2xl border border-error-500/20 bg-error-500/5 p-8 backdrop-blur-[24px] text-center">
-          <h2 className="text-lg font-semibold text-[#F5F5F0]">
+        <div className="rounded-2xl border border-[var(--color-error)]/20 bg-[var(--color-error)]/[0.05] p-8 backdrop-blur-[24px] text-center">
+          <h2 className="text-lg font-semibold text-[var(--color-fg)]">
             {error ?? "Gagal memuat detail invoice."}
           </h2>
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="mt-4 rounded-full border border-[rgba(255,191,0,0.12)] bg-[rgba(25,20,0,0.6)] px-6 py-2.5 text-sm font-medium text-[#F5F5F0]/60 transition-colors hover:border-[rgba(255,191,0,0.3)] hover:text-[#F5F5F0]"
+            className="mt-4 rounded-full border border-[var(--color-line)] bg-[var(--color-surface-2)] px-6 py-2.5 text-sm font-medium text-[var(--color-fg-muted)] transition-colors hover:border-[var(--color-accent)]/30 hover:text-[var(--color-fg)]"
           >
             Coba Lagi
           </button>
         </div>
       </div>
-    );
+        </div>
+      </RevealOnScroll>
+        );
   }
 
   const statusInfo = statusConfig[invoice.status] ?? statusConfig.pending;
@@ -172,11 +181,13 @@ export default function InvoiceDetailPage() {
 
   // ── Render ──────────────────────────────────────────────────────────────
   return (
+    <RevealOnScroll>
+      <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
     <div className="space-y-6">
       {/* Back link */}
       <Link
         href="/invoices"
-        className="inline-flex items-center gap-1 text-sm text-[#FFBF00]/60 transition-colors hover:text-[#FFBF00]"
+        className="inline-flex items-center gap-1 text-sm text-[var(--color-accent)]/60 transition-colors hover:text-[var(--color-accent)]"
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -188,7 +199,7 @@ export default function InvoiceDetailPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-[#F5F5F0]">
+            <h1 className="text-[32px] font-bold leading-none tracking-tight text-[var(--color-fg)]">
               Invoice #{invoice.invoice_number ?? invoice.public_id}
             </h1>
             <span
@@ -197,34 +208,34 @@ export default function InvoiceDetailPage() {
               {statusInfo.label}
             </span>
           </div>
-          <p className="mt-1 text-sm text-[#F5F5F0]/40">
+          <p className="mt-1 text-sm text-[var(--color-fg-dim)]">
             Dibuat pada {formatDate(invoice.created_at)}
           </p>
         </div>
 
         <div className="text-right">
-          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/50">
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/50">
             Total
           </p>
-          <p className="text-2xl font-bold text-[#FFBF00]">
+          <p className="text-2xl font-bold text-[var(--color-accent)]">
             {formatPrice(invoice.total, invoice.currency)}
           </p>
         </div>
       </div>
 
       {/* ─── Order Info ───────────────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-6 backdrop-blur-[24px]">
-        <h2 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/60">
+      <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 backdrop-blur-[24px]">
+        <h2 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/60">
           Informasi Order
         </h2>
 
         <div className="space-y-3">
           {invoice.order_number && (
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[#F5F5F0]/50">Nomor Order</span>
+              <span className="text-[var(--color-fg-muted)]">Nomor Order</span>
               <Link
                 href={`/orders/${invoice.order_public_id}`}
-                className="font-mono text-xs text-[#FFBF00] hover:underline"
+                className="font-mono text-xs text-[var(--color-accent)] hover:underline"
               >
                 {invoice.order_number}
               </Link>
@@ -233,12 +244,12 @@ export default function InvoiceDetailPage() {
 
           {invoice.due_date && (
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[#F5F5F0]/50">Jatuh Tempo</span>
+              <span className="text-[var(--color-fg-muted)]">Jatuh Tempo</span>
               <span
                 className={
                   invoice.status === "pending"
-                    ? "text-amber-400"
-                    : "text-[#F5F5F0]"
+                    ? "text-[var(--color-amber)]"
+                    : "text-[var(--color-fg)]"
                 }
               >
                 {formatDate(invoice.due_date)}
@@ -248,8 +259,8 @@ export default function InvoiceDetailPage() {
 
           {invoice.paid_at && (
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[#F5F5F0]/50">Dibayar pada</span>
-              <span className="text-success-400">
+              <span className="text-[var(--color-fg-muted)]">Dibayar pada</span>
+              <span className="text-[var(--color-success)]">
                 {formatDate(invoice.paid_at)}
               </span>
             </div>
@@ -258,8 +269,8 @@ export default function InvoiceDetailPage() {
       </div>
 
       {/* ─── Items Breakdown ──────────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-6 backdrop-blur-[24px]">
-        <h2 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/60">
+      <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 backdrop-blur-[24px]">
+        <h2 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/60">
           Rincian
         </h2>
 
@@ -270,15 +281,15 @@ export default function InvoiceDetailPage() {
               className="flex items-start justify-between text-sm"
             >
               <div>
-                <p className="text-[#F5F5F0]">{item.description}</p>
+                <p className="text-[var(--color-fg)]">{item.description}</p>
                 {item.quantity > 1 && (
-                  <p className="text-xs text-[#F5F5F0]/40">
+                  <p className="text-xs text-[var(--color-fg-dim)]">
                     {formatPrice(item.unit_price, invoice.currency)} &times;{" "}
                     {item.quantity}
                   </p>
                 )}
               </div>
-              <span className="font-medium text-[#F5F5F0]">
+              <span className="font-medium text-[var(--color-fg)]">
                 {formatPrice(item.subtotal, invoice.currency)}
               </span>
             </div>
@@ -286,18 +297,18 @@ export default function InvoiceDetailPage() {
         </div>
 
         {/* Totals */}
-        <div className="mt-4 border-t border-[rgba(255,191,0,0.08)] pt-4 space-y-2">
+        <div className="mt-4 border-t border-[var(--color-line)] pt-4 space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-[#F5F5F0]/50">Subtotal</span>
-            <span className="text-[#F5F5F0]">
+            <span className="text-[var(--color-fg-muted)]">Subtotal</span>
+            <span className="text-[var(--color-fg)]">
               {formatPrice(invoice.subtotal, invoice.currency)}
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/60">
+            <span className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/60">
               Total
             </span>
-            <span className="text-xl font-bold text-[#FFBF00]">
+            <span className="text-xl font-bold text-[var(--color-accent)]">
               {formatPrice(invoice.total, invoice.currency)}
             </span>
           </div>
@@ -306,37 +317,37 @@ export default function InvoiceDetailPage() {
 
       {/* ─── Payment Info (for paid invoices) ─────────────────────────────── */}
       {isPaid && invoice.payment && (
-        <div className="rounded-2xl border border-success-500/10 bg-success-500/5 p-6 backdrop-blur-[24px]">
-          <h2 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-success-400/60">
+        <div className="rounded-2xl border border-[var(--color-success)]/10 bg-[var(--color-success)]/5 p-6 backdrop-blur-[24px]">
+          <h2 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-success)]/60">
             Informasi Pembayaran
           </h2>
 
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[#F5F5F0]/50">Metode</span>
-              <span className="text-[#F5F5F0]">
+              <span className="text-[var(--color-fg-muted)]">Metode</span>
+              <span className="text-[var(--color-fg)]">
                 {invoice.payment.method ?? "Midtrans Snap"}
               </span>
             </div>
 
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[#F5F5F0]/50">Waktu Pembayaran</span>
-              <span className="text-success-400">
+              <span className="text-[var(--color-fg-muted)]">Waktu Pembayaran</span>
+              <span className="text-[var(--color-success)]">
                 {formatDate(invoice.payment.paid_at)}
               </span>
             </div>
 
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[#F5F5F0]/50">Jumlah Dibayar</span>
-              <span className="font-semibold text-[#F5F5F0]">
+              <span className="text-[var(--color-fg-muted)]">Jumlah Dibayar</span>
+              <span className="font-semibold text-[var(--color-fg)]">
                 {formatPrice(invoice.payment.amount, invoice.payment.currency)}
               </span>
             </div>
 
             {invoice.payment.reference && (
               <div className="flex items-center justify-between text-sm">
-                <span className="text-[#F5F5F0]/50">Referensi</span>
-                <span className="font-mono text-xs text-[#F5F5F0]/60">
+                <span className="text-[var(--color-fg-muted)]">Referensi</span>
+                <span className="font-mono text-xs text-[var(--color-fg-muted)]">
                   {invoice.payment.reference}
                 </span>
               </div>
@@ -350,7 +361,7 @@ export default function InvoiceDetailPage() {
         {isPaid && (
           <span
             title="PDF generation coming soon"
-            className="pointer-events-none inline-flex items-center gap-2 rounded-full bg-[#FFBF00] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] opacity-50 cursor-not-allowed"
+            className="pointer-events-none inline-flex items-center gap-2 rounded-full bg-[var(--color-accent)] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] opacity-50 cursor-not-allowed"
           >
             <svg
               className="h-4 w-4"
@@ -373,7 +384,7 @@ export default function InvoiceDetailPage() {
         {invoice.status === "pending" && invoice.order_public_id && (
           <Link
             href={`/orders/${invoice.order_public_id}`}
-            className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,191,0,0.12)] bg-[rgba(25,20,0,0.6)] px-6 py-2.5 text-sm font-medium text-[#F5F5F0]/60 transition-colors hover:border-[rgba(255,191,0,0.3)] hover:text-[#F5F5F0]"
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-[var(--color-surface-2)] px-6 py-2.5 text-sm font-medium text-[var(--color-fg-muted)] transition-colors hover:border-[var(--color-accent)]/30 hover:text-[var(--color-fg)]"
           >
             Bayar Sekarang
           </Link>
@@ -382,12 +393,14 @@ export default function InvoiceDetailPage() {
         {invoice.order_public_id && (
           <Link
             href={`/orders/${invoice.order_public_id}`}
-            className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,191,0,0.08)] bg-transparent px-6 py-2.5 text-sm font-medium text-[#F5F5F0]/40 transition-colors hover:border-[rgba(255,191,0,0.15)] hover:text-[#F5F5F0]/70"
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-transparent px-6 py-2.5 text-sm font-medium text-[var(--color-fg-dim)] transition-colors hover:border-[var(--color-accent-soft)] hover:text-[var(--color-fg-muted)]"
           >
             Lihat Order
           </Link>
         )}
       </div>
     </div>
-  );
+      </div>
+    </RevealOnScroll>
+    );
 }

@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { getProfile, type User } from "@/lib/auth";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Alert } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProfileForm } from "@/features/profile/components/profile-form";
+import { RevealOnScroll } from "@/components/landing/reveal-on-scroll";
 
 export default function CustomerSettingsPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -28,66 +28,103 @@ export default function CustomerSettingsPage() {
     loadProfile();
   }, []);
 
+  // ── Loading ────────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div>
-          <Skeleton width="200px" height="28px" />
-          <Skeleton width="300px" height="16px" className="mt-2" />
+      <RevealOnScroll>
+        <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
+          <header className="reveal-rise mb-10">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-fg-dim)]">
+              JadeNode · Customer
+            </p>
+            <div className="mt-2 h-9 w-48 animate-pulse rounded bg-[var(--color-surface-3)]" />
+          </header>
+          <div className="reveal-rise rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)]/50 p-6">
+            <div className="mb-5 h-6 w-40 animate-pulse rounded bg-[var(--color-surface-3)]" />
+            <div className="space-y-5">
+              <Skeleton height="56px" />
+              <Skeleton height="56px" />
+              <Skeleton height="56px" />
+              <Skeleton height="56px" />
+              <Skeleton width="160px" height="40px" />
+            </div>
+          </div>
         </div>
-        <Card>
-          <CardHeader>
-            <Skeleton width="120px" height="24px" />
-          </CardHeader>
-          <CardContent className="space-y-5">
-            <Skeleton height="40px" />
-            <Skeleton height="40px" />
-            <Skeleton height="40px" />
-            <Skeleton height="40px" />
-            <Skeleton height="40px" />
-            <Skeleton width="160px" height="40px" />
-          </CardContent>
-        </Card>
-      </div>
+      </RevealOnScroll>
     );
   }
 
+  // ── Error ──────────────────────────────────────────────────────────────────
   if (loadError) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Pengaturan</h1>
-          <p className="mt-1 text-sm text-secondary-500">
-            Kelola profil dan preferensi akun kamu.
-          </p>
+      <RevealOnScroll>
+        <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
+          <header className="reveal-rise mb-10">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-fg-dim)]">
+              JadeNode · Customer
+            </p>
+            <h1 className="mt-2 text-[32px] font-bold leading-none tracking-tight text-[var(--color-fg)]">
+              Pengaturan
+            </h1>
+          </header>
+          <Alert variant="error">{loadError}</Alert>
         </div>
-        <Alert variant="error">{loadError}</Alert>
-      </div>
+      </RevealOnScroll>
     );
   }
 
   if (!user) return null;
 
+  // ── Main ───────────────────────────────────────────────────────────────────
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Pengaturan</h1>
-        <p className="mt-1 text-sm text-secondary-500">
-          Kelola profil dan preferensi akun kamu.
-        </p>
-      </div>
+    <RevealOnScroll>
+      <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
+        {/* ────────────────────── HEADER ────────────────────── */}
+        <header className="reveal-rise mb-10 flex items-end justify-between gap-6">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-fg-dim)]">
+              JadeNode · Customer
+            </p>
+            <h1 className="mt-2 text-[32px] font-bold leading-none tracking-tight text-[var(--color-fg)]">
+              Pengaturan
+            </h1>
+            <p className="mt-3 text-sm text-[var(--color-fg-muted)]">
+              Kelola profil dan preferensi akun kamu.
+            </p>
+          </div>
+          <span className="hidden truncate rounded-full border border-[var(--color-line)] px-3 py-1.5 font-mono text-[10px] text-[var(--color-fg-dim)] sm:block">
+            {user.email}
+          </span>
+        </header>
 
-      <Card>
-        <CardHeader>
-          <h2 className="text-lg font-semibold text-foreground">Profil</h2>
-        </CardHeader>
-        <CardContent>
-          <ProfileForm
-            user={user}
-            onUpdate={(updatedUser) => setUser(updatedUser)}
-          />
-        </CardContent>
-      </Card>
-    </div>
+        {/* ────────────────────── PROFILE CARD ────────────────────── */}
+        <section className="reveal-rise overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)]/50">
+          <div className="border-b border-[var(--color-line)]/70 px-6 py-5">
+            <div className="flex items-center gap-3">
+              <span
+                className="grid h-9 w-9 place-items-center rounded-full bg-[var(--color-accent-soft)] font-mono text-[11px] font-bold text-[var(--color-accent)]"
+                aria-hidden
+              >
+                {(user.name ?? user.email)[0]?.toUpperCase()}
+              </span>
+              <div>
+                <h2 className="text-base font-semibold text-[var(--color-fg)]">
+                  Profil
+                </h2>
+                <p className="text-xs text-[var(--color-fg-dim)]">
+                  Informasi ini tampil di invoice dan tiket dukungan.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6">
+            <ProfileForm
+              user={user}
+              onUpdate={(updatedUser) => setUser(updatedUser)}
+            />
+          </div>
+        </section>
+      </div>
+    </RevealOnScroll>
   );
 }

@@ -8,6 +8,7 @@ import {
   PaymentMethodSheet,
   type PayableInvoice,
 } from "@/features/checkout/components/payment-method-sheet";
+import { RevealOnScroll } from "@/components/landing/reveal-on-scroll";
 
 // ─── Types (match InvoiceResource) ────────────────────────────────────────────
 
@@ -35,22 +36,22 @@ const statusConfig: Record<InvoiceStatus, { label: string; style: string; icon: 
   {
     pending: {
       label: "Menunggu",
-      style: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+      style: "bg-[var(--color-amber)]/10 text-[var(--color-amber)] border-[var(--color-amber)]/20",
       icon: "schedule",
     },
     paid: {
       label: "Dibayar",
-      style: "bg-success-500/10 text-success-400 border-success-500/20",
+      style: "bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]/20",
       icon: "check_circle",
     },
     cancelled: {
       label: "Dibatalkan",
-      style: "bg-error-500/10 text-error-400 border-error-500/20",
+      style: "bg-[var(--color-error)]/10 text-[var(--color-error)] border-[var(--color-error)]/20",
       icon: "cancel",
     },
     void: {
       label: "Void",
-      style: "bg-neutral-500/10 text-neutral-400 border-neutral-500/20",
+      style: "bg-[var(--color-surface-3)] text-[var(--color-fg-dim)] border-[var(--color-line)]",
       icon: "block",
     },
   };
@@ -119,53 +120,63 @@ export default function InvoicesPage() {
   // ── Loading skeleton ──────────────────────────────────────────────────────
   if (loading) {
     return (
+      <RevealOnScroll>
+        <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
       <div className="space-y-6">
         <div>
-          <div className="h-8 w-40 animate-pulse rounded bg-[rgba(255,191,0,0.08)]" />
-          <div className="mt-2 h-4 w-72 animate-pulse rounded bg-[rgba(255,191,0,0.05)]" />
+          <div className="h-8 w-40 animate-pulse rounded bg-[var(--color-accent-soft)]" />
+          <div className="mt-2 h-4 w-72 animate-pulse rounded bg-[var(--color-surface-2)]" />
         </div>
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="h-24 animate-pulse rounded-2xl bg-[rgba(255,191,0,0.04)]"
+              className="h-24 animate-pulse rounded-2xl bg-[var(--color-surface-2)]"
             />
           ))}
         </div>
       </div>
-    );
+        </div>
+      </RevealOnScroll>
+        );
   }
 
   // ── Error ─────────────────────────────────────────────────────────────────
   if (error) {
     return (
+      <RevealOnScroll>
+        <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-[#F5F5F0]">Invoices</h1>
-        <div className="rounded-2xl border border-error-500/20 bg-error-500/5 p-8 text-center backdrop-blur-[24px]">
-          <p className="text-sm text-error-400">{error}</p>
+        <h1 className="text-[32px] font-bold leading-none tracking-tight text-[var(--color-fg)]">Invoices</h1>
+        <div className="rounded-2xl border border-[var(--color-error)]/20 bg-[var(--color-error)]/[0.05] p-8 text-center backdrop-blur-[24px]">
+          <p className="text-sm text-[var(--color-error)]">{error}</p>
           <button
             type="button"
             onClick={fetchInvoices}
-            className="mt-4 rounded-full border border-[rgba(255,191,0,0.12)] bg-[rgba(25,20,0,0.6)] px-6 py-2.5 text-sm font-medium text-[#F5F5F0]/60 transition-colors hover:border-[rgba(255,191,0,0.3)] hover:text-[#F5F5F0]"
+            className="mt-4 rounded-full border border-[var(--color-line)] bg-[var(--color-surface-2)] px-6 py-2.5 text-sm font-medium text-[var(--color-fg-muted)] transition-colors hover:border-[var(--color-accent)]/30 hover:text-[var(--color-fg)]"
           >
             Coba Lagi
           </button>
         </div>
       </div>
-    );
+        </div>
+      </RevealOnScroll>
+        );
   }
 
   // ── Main ──────────────────────────────────────────────────────────────────
   return (
+    <RevealOnScroll>
+      <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#F5F5F0]">Invoices</h1>
-          <p className="mt-1 text-sm text-[#F5F5F0]/50">
+          <h1 className="text-[32px] font-bold leading-none tracking-tight text-[var(--color-fg)]">Invoices</h1>
+          <p className="mt-2 text-sm text-[var(--color-fg-muted)]">
             Lihat, bayar, dan kelola semua invoice Anda.
             {pendingCount > 0 && (
-              <span className="ml-2 text-amber-400">
+              <span className="ml-2 text-[var(--color-amber)]">
                 {pendingCount} menunggu pembayaran
               </span>
             )}
@@ -182,8 +193,8 @@ export default function InvoicesPage() {
               aria-pressed={filter === f.key}
               className={`rounded-full border px-4 py-1.5 text-xs font-medium transition-colors ${
                 filter === f.key
-                  ? "border-[rgba(255,191,0,0.4)] bg-[rgba(255,191,0,0.1)] text-[#FFBF00]"
-                  : "border-[rgba(255,191,0,0.12)] text-[#F5F5F0]/50 hover:border-[rgba(255,191,0,0.25)] hover:text-[#F5F5F0]/80"
+                  ? "border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
+                  : "border-[var(--color-line)] text-[var(--color-fg-muted)] hover:border-[var(--color-accent)]/25 hover:text-[var(--color-fg)]"
               }`}
             >
               {f.label}
@@ -194,18 +205,18 @@ export default function InvoicesPage() {
 
       {/* Empty */}
       {filtered.length === 0 ? (
-        <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-12 text-center backdrop-blur-[24px]">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[rgba(255,191,0,0.06)]">
-            <span className="material-symbols-outlined text-[32px] text-[#FFBF00]/40">
+        <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-12 text-center backdrop-blur-[24px]">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent-soft)]">
+            <span className="material-symbols-outlined text-[32px] text-[var(--color-accent)]/40">
               receipt_long
             </span>
           </div>
-          <h3 className="mt-4 text-lg font-semibold text-[#F5F5F0]">
+          <h3 className="mt-4 text-lg font-semibold text-[var(--color-fg)]">
             {filter === "all"
               ? "Belum Ada Invoice"
               : `Tidak ada invoice ${filter === "pending" ? "menunggu" : "dibayar"}`}
           </h3>
-          <p className="mt-2 text-sm text-[#F5F5F0]/40">
+          <p className="mt-2 text-sm text-[var(--color-fg-dim)]">
             {filter === "all"
               ? "Invoice akan muncul setelah Anda membuat order."
               : "Coba filter lain untuk melihat invoice Anda."}
@@ -213,7 +224,7 @@ export default function InvoicesPage() {
           {filter === "all" && (
             <Link
               href="/marketplace"
-              className="mt-6 inline-flex items-center rounded-full bg-[#FFBF00] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] shadow-[0_0_20px_rgba(255,191,0,0.25)]"
+              className="mt-6 inline-flex items-center rounded-full bg-[var(--color-accent)] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] shadow-[0_0_20px_var(--color-accent-soft)]"
             >
               Jelajahi Marketplace
             </Link>
@@ -228,13 +239,13 @@ export default function InvoicesPage() {
             return (
               <div
                 key={invoice.public_id}
-                className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-6 backdrop-blur-[24px] transition-colors hover:border-[rgba(255,191,0,0.18)]"
+                className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 backdrop-blur-[24px] transition-colors hover:border-[var(--color-accent-soft)]"
               >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   {/* Info */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-xs text-[#F5F5F0]/40">
+                      <span className="font-mono text-xs text-[var(--color-fg-dim)]">
                         {invoice.invoice_number ?? invoice.public_id}
                       </span>
                       <span
@@ -248,17 +259,17 @@ export default function InvoicesPage() {
                     </div>
 
                     {invoice.order?.order_number && (
-                      <p className="mt-1 text-xs text-[#F5F5F0]/40">
+                      <p className="mt-1 text-xs text-[var(--color-fg-dim)]">
                         Order: {invoice.order.order_number}
                       </p>
                     )}
 
-                    <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-[#F5F5F0]/40">
+                    <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-[var(--color-fg-dim)]">
                       <span>{formatDate(invoice.created_at)}</span>
                       {invoice.due_at && isPending && (
                         <>
                           <span>•</span>
-                          <span className="text-amber-400/60">
+                          <span className="text-[var(--color-amber)]/60">
                             Jatuh tempo: {formatDate(invoice.due_at)}
                           </span>
                         </>
@@ -268,13 +279,13 @@ export default function InvoicesPage() {
 
                   {/* Total + actions */}
                   <div className="flex items-center gap-4">
-                    <span className="text-lg font-bold text-[#FFBF00]">
+                    <span className="text-lg font-bold text-[var(--color-accent)]">
                       {formatPrice(invoice.total_minor, invoice.currency)}
                     </span>
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/invoices/${invoice.public_id}`}
-                        className="rounded-full border border-[rgba(255,191,0,0.12)] px-4 py-2 text-xs font-medium text-[#F5F5F0]/60 transition-colors hover:border-[rgba(255,191,0,0.3)] hover:text-[#F5F5F0]"
+                        className="rounded-full border border-[var(--color-line)] px-4 py-2 text-xs font-medium text-[var(--color-fg-muted)] transition-colors hover:border-[var(--color-accent)]/30 hover:text-[var(--color-fg)]"
                       >
                         Detail
                       </Link>
@@ -290,7 +301,7 @@ export default function InvoicesPage() {
                               currency: invoice.currency,
                             })
                           }
-                          className="inline-flex items-center gap-1.5 rounded-full bg-[#FFBF00] px-4 py-2 text-xs font-semibold text-[#0D0B00] shadow-[0_0_16px_rgba(255,191,0,0.25)] transition-transform hover:scale-[1.02]"
+                          className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-accent)] px-4 py-2 text-xs font-semibold text-[#0D0B00] shadow-[0_0_16px_var(--color-accent-soft)] transition-transform hover:scale-[1.02]"
                         >
                           <span className="material-symbols-outlined text-[15px]">
                             lock
@@ -319,5 +330,7 @@ export default function InvoicesPage() {
         />
       )}
     </div>
-  );
+      </div>
+    </RevealOnScroll>
+    );
 }

@@ -144,10 +144,10 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
         error={errors.name?.[0]}
       />
 
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         <label
           htmlFor="profile-email"
-          className="block text-sm font-medium text-foreground"
+          className="block text-[13px] font-medium text-[var(--color-fg-muted)]"
         >
           Email
         </label>
@@ -156,7 +156,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
           type="email"
           disabled
           value={user.email}
-          className="block w-full max-w-md rounded-lg border border-secondary-200 bg-secondary-50 px-3 py-2 text-sm text-secondary-400"
+          className="block w-full max-w-md cursor-not-allowed rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-2)] px-3 py-2.5 text-sm text-[var(--color-fg-dim)]"
         />
       </div>
 
@@ -170,10 +170,10 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
         error={errors.phone?.[0]}
       />
 
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         <label
           htmlFor="profile-country"
-          className="block text-sm font-medium text-foreground"
+          className="block text-[13px] font-medium text-[var(--color-fg-muted)]"
         >
           Negara
         </label>
@@ -181,7 +181,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
           id="profile-country"
           value={form.country ?? ""}
           onChange={(e) => updateField("country", e.target.value || null)}
-          className="block w-full max-w-md rounded-lg border border-secondary-200 bg-white px-3 py-2 text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+          className="block w-full max-w-md rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-2)] px-3 py-2.5 text-sm text-[var(--color-fg)] transition-colors focus:border-[var(--color-accent)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/15"
         >
           <option value="">Pilih negara</option>
           {COUNTRIES.map((c) => (
@@ -191,14 +191,14 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
           ))}
         </select>
         {errors.country && (
-          <p className="text-xs text-error-600">{errors.country[0]}</p>
+          <p className="text-xs text-[var(--color-error)]">{errors.country[0]}</p>
         )}
       </div>
 
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         <label
           htmlFor="profile-timezone"
-          className="block text-sm font-medium text-foreground"
+          className="block text-[13px] font-medium text-[var(--color-fg-muted)]"
         >
           Zona Waktu
         </label>
@@ -206,7 +206,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
           id="profile-timezone"
           value={form.timezone ?? ""}
           onChange={(e) => updateField("timezone", e.target.value || null)}
-          className="block w-full max-w-md rounded-lg border border-secondary-200 bg-white px-3 py-2 text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+          className="block w-full max-w-md rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-2)] px-3 py-2.5 text-sm text-[var(--color-fg)] transition-colors focus:border-[var(--color-accent)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/15"
         >
           <option value="">Pilih zona waktu</option>
           {TIMEZONES.map((tz) => (
@@ -216,7 +216,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
           ))}
         </select>
         {errors.timezone && (
-          <p className="text-xs text-error-600">{errors.timezone[0]}</p>
+          <p className="text-xs text-[var(--color-error)]">{errors.timezone[0]}</p>
         )}
       </div>
 

@@ -37,7 +37,7 @@ const navSections = [
 ];
 
 const bottomNav = [
-  { label: "Pengaturan", href: "/settings", icon: "settings" },
+  { label: "Profile & Pengaturan", href: "/settings", icon: "manage_accounts" },
 ];
 
 export function CustomerSidebar() {
@@ -158,30 +158,6 @@ export function CustomerSidebar() {
             </Link>
           );
         })}
-
-        {/* Profile link */}
-        <Link
-          href="/settings"
-          className={cn(
-            "flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-[var(--dur-standard)]",
-            pathname === "/settings"
-              ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
-              : "text-[var(--color-fg-muted)] hover:bg-white/[0.03] hover:text-[var(--color-fg)]",
-          )}
-        >
-          <span
-            className={cn(
-              "material-symbols-outlined text-[18px]",
-              pathname === "/settings"
-                ? "text-[var(--color-accent)]"
-                : "text-[var(--color-fg-dim)]",
-            )}
-            style={{ fontVariationSettings: '"FILL" 0, "wght" 300, "GRAD" 0, "opsz" 20' }}
-          >
-            account_circle
-          </span>
-          Profile
-        </Link>
 
         {/* Logout button */}
         <button

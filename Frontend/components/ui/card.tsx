@@ -26,7 +26,9 @@ function Card({ className, children, interactive = false, ...props }: CardProps)
     <div
       onMouseMove={handleMouseMove}
       className={cn(
-        interactive ? "interactive-card" : "glass-panel",
+        "rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)]/60 backdrop-blur-xl",
+        interactive &&
+          "transition-colors hover:border-[var(--color-line-strong)]",
         "p-8",
         className,
       )}
@@ -40,7 +42,7 @@ function Card({ className, children, interactive = false, ...props }: CardProps)
 function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("border-b border-surface-glass-border px-6 py-4", className)}
+      className={cn("border-b border-[var(--color-line)] px-6 py-4", className)}
       {...props}
     />
   );
@@ -53,10 +55,10 @@ function CardContent({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
 function CardFooter({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("border-t border-surface-glass-border px-6 py-4", className)}
+      className={cn("border-t border-[var(--color-line)] px-6 py-4", className)}
       {...props}
     />
   );
 }
 
-export { Card, CardHeader, CardContent, CardFooter };
+export { Card, CardContent, CardFooter, CardHeader };

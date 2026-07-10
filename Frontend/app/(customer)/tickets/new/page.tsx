@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api, ApiException } from "@/lib/api";
+import { RevealOnScroll } from "@/components/landing/reveal-on-scroll";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -67,11 +68,13 @@ export default function NewTicketPage() {
   ];
 
   return (
+    <RevealOnScroll>
+      <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
     <div className="space-y-6">
       {/* Back link */}
       <Link
         href="/tickets"
-        className="inline-flex items-center gap-1 text-sm text-[#FFBF00]/60 transition-colors hover:text-[#FFBF00]"
+        className="inline-flex items-center gap-1 text-sm text-[var(--color-accent)]/60 transition-colors hover:text-[var(--color-accent)]"
       >
         <svg
           className="h-4 w-4"
@@ -91,8 +94,8 @@ export default function NewTicketPage() {
 
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-[#F5F5F0]">Buat Tiket Baru</h1>
-        <p className="mt-1 text-sm text-[#F5F5F0]/50">
+        <h1 className="text-[32px] font-bold leading-none tracking-tight text-[var(--color-fg)]">Buat Tiket Baru</h1>
+        <p className="mt-2 text-sm text-[var(--color-fg-muted)]">
           Jelaskan masalah Anda dan tim kami akan segera membantu.
         </p>
       </div>
@@ -100,12 +103,12 @@ export default function NewTicketPage() {
       {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-6 backdrop-blur-[24px]"
+        className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 backdrop-blur-[24px]"
       >
         <div className="space-y-6">
           {/* Error */}
           {error && (
-            <div className="rounded-xl border border-error-500/20 bg-error-500/5 px-4 py-3 text-sm text-error-400">
+            <div className="rounded-xl border border-[var(--color-error)]/20 bg-[var(--color-error)]/[0.05] px-4 py-3 text-sm text-[var(--color-error)]">
               {error}
             </div>
           )}
@@ -114,7 +117,7 @@ export default function NewTicketPage() {
           <div className="space-y-2">
             <label
               htmlFor="subject"
-              className="block font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/60"
+              className="block font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/60"
             >
               Subjek
             </label>
@@ -125,10 +128,10 @@ export default function NewTicketPage() {
               onChange={(e) => setSubject(e.target.value)}
               placeholder="Contoh: VPS tidak bisa diakses"
               maxLength={255}
-              className="block w-full rounded-xl border border-[rgba(255,191,0,0.1)] bg-[rgba(25,20,0,0.4)] px-4 py-3 text-sm text-[#F5F5F0] placeholder-[#F5F5F0]/30 transition-colors focus:border-[rgba(255,191,0,0.3)] focus:outline-none focus:ring-1 focus:ring-[#FFBF00]/20"
+              className="block w-full rounded-xl border border-[var(--color-accent-soft)] bg-[var(--color-surface-2)] px-4 py-3 text-sm text-[var(--color-fg)] placeholder-[var(--color-fg)]/30 transition-colors focus:border-[var(--color-accent)]/30 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]/20"
             />
             {validationErrors.subject && (
-              <p className="text-xs text-error-400">
+              <p className="text-xs text-[var(--color-error)]">
                 {validationErrors.subject[0]}
               </p>
             )}
@@ -136,7 +139,7 @@ export default function NewTicketPage() {
 
           {/* Priority */}
           <div className="space-y-2">
-            <label className="block font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/60">
+            <label className="block font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/60">
               Prioritas
             </label>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -147,8 +150,8 @@ export default function NewTicketPage() {
                   onClick={() => setPriority(opt.value)}
                   className={`rounded-xl border px-4 py-3 text-left transition-colors ${
                     priority === opt.value
-                      ? "border-[#FFBF00]/30 bg-[#FFBF00]/10 text-[#FFBF00]"
-                      : "border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.3)] text-[#F5F5F0]/60 hover:border-[rgba(255,191,0,0.15)]"
+                      ? "border-[var(--color-accent)]/30 bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
+                      : "border-[var(--color-line)] bg-[rgba(25,20,0,0.3)] text-[var(--color-fg-muted)] hover:border-[var(--color-accent-soft)]"
                   }`}
                 >
                   <span className="block text-sm font-medium">{opt.label}</span>
@@ -159,7 +162,7 @@ export default function NewTicketPage() {
               ))}
             </div>
             {validationErrors.priority && (
-              <p className="text-xs text-error-400">
+              <p className="text-xs text-[var(--color-error)]">
                 {validationErrors.priority[0]}
               </p>
             )}
@@ -169,7 +172,7 @@ export default function NewTicketPage() {
           <div className="space-y-2">
             <label
               htmlFor="message"
-              className="block font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/60"
+              className="block font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/60"
             >
               Pesan
             </label>
@@ -179,10 +182,10 @@ export default function NewTicketPage() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Jelaskan masalah Anda secara detail..."
-              className="block w-full rounded-xl border border-[rgba(255,191,0,0.1)] bg-[rgba(25,20,0,0.4)] px-4 py-3 text-sm text-[#F5F5F0] placeholder-[#F5F5F0]/30 transition-colors focus:border-[rgba(255,191,0,0.3)] focus:outline-none focus:ring-1 focus:ring-[#FFBF00]/20"
+              className="block w-full rounded-xl border border-[var(--color-accent-soft)] bg-[var(--color-surface-2)] px-4 py-3 text-sm text-[var(--color-fg)] placeholder-[var(--color-fg)]/30 transition-colors focus:border-[var(--color-accent)]/30 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]/20"
             />
             {validationErrors.message && (
-              <p className="text-xs text-error-400">
+              <p className="text-xs text-[var(--color-error)]">
                 {validationErrors.message[0]}
               </p>
             )}
@@ -192,14 +195,14 @@ export default function NewTicketPage() {
           <div className="flex items-center justify-end gap-3">
             <Link
               href="/tickets"
-              className="rounded-full border border-[rgba(255,191,0,0.12)] bg-[rgba(25,20,0,0.6)] px-6 py-2.5 text-sm font-medium text-[#F5F5F0]/60 transition-colors hover:border-[rgba(255,191,0,0.3)] hover:text-[#F5F5F0]"
+              className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface-2)] px-6 py-2.5 text-sm font-medium text-[var(--color-fg-muted)] transition-colors hover:border-[var(--color-accent)]/30 hover:text-[var(--color-fg)]"
             >
               Batal
             </Link>
             <button
               type="submit"
               disabled={submitting || !subject.trim() || !message.trim()}
-              className="inline-flex items-center rounded-full bg-[#FFBF00] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] shadow-[0_0_20px_rgba(255,191,0,0.25)] transition-all hover:shadow-[0_0_30px_rgba(255,191,0,0.4)] disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center rounded-full bg-[var(--color-accent)] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] shadow-[0_0_20px_var(--color-accent-soft)] transition-all hover:shadow-[0_0_30px_rgba(198,242,74,0.4)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {submitting ? (
                 <>
@@ -214,5 +217,7 @@ export default function NewTicketPage() {
         </div>
       </form>
     </div>
-  );
+      </div>
+    </RevealOnScroll>
+    );
 }

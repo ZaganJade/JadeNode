@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { api, ApiException } from "@/lib/api";
+import { RevealOnScroll } from "@/components/landing/reveal-on-scroll";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -38,38 +39,38 @@ interface TicketShowResponse {
 const statusConfig: Record<TicketStatus, { label: string; style: string }> = {
   open: {
     label: "Open",
-    style: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+    style: "bg-[var(--color-amber)]/10 text-[var(--color-amber)] border-[var(--color-amber)]/20",
   },
   in_progress: {
     label: "Diproses",
-    style: "bg-info-500/10 text-info-400 border-info-500/20",
+    style: "bg-[var(--color-steel)]/10 text-[var(--color-steel)] border-[var(--color-steel)]/20",
   },
   resolved: {
     label: "Terselesaikan",
-    style: "bg-success-500/10 text-success-400 border-success-500/20",
+    style: "bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]/20",
   },
   closed: {
     label: "Ditutup",
-    style: "bg-neutral-500/10 text-neutral-400 border-neutral-500/20",
+    style: "bg-[var(--color-surface-3)] text-[var(--color-fg-dim)] border-[var(--color-line)]",
   },
 };
 
 const priorityConfig: Record<TicketPriority, { label: string; style: string }> = {
   low: {
     label: "Low",
-    style: "bg-neutral-500/10 text-neutral-400 border-neutral-500/20",
+    style: "bg-[var(--color-surface-3)] text-[var(--color-fg-dim)] border-[var(--color-line)]",
   },
   medium: {
     label: "Medium",
-    style: "bg-info-500/10 text-info-400 border-info-500/20",
+    style: "bg-[var(--color-steel)]/10 text-[var(--color-steel)] border-[var(--color-steel)]/20",
   },
   high: {
     label: "High",
-    style: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+    style: "bg-[var(--color-amber)]/10 text-[var(--color-amber)] border-[var(--color-amber)]/20",
   },
   urgent: {
     label: "Urgent",
-    style: "bg-error-500/10 text-error-400 border-error-500/20",
+    style: "bg-[var(--color-error)]/10 text-[var(--color-error)] border-[var(--color-error)]/20",
   },
 };
 
@@ -159,24 +160,30 @@ export default function TicketDetailPage() {
   // ── Loading skeleton ────────────────────────────────────────────────────
   if (loading) {
     return (
+      <RevealOnScroll>
+        <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 animate-pulse rounded bg-[rgba(255,191,0,0.08)]" />
-          <div className="h-8 w-64 animate-pulse rounded bg-[rgba(255,191,0,0.08)]" />
+          <div className="h-8 w-8 animate-pulse rounded bg-[var(--color-accent-soft)]" />
+          <div className="h-8 w-64 animate-pulse rounded bg-[var(--color-accent-soft)]" />
         </div>
-        <div className="h-[200px] animate-pulse rounded-2xl bg-[rgba(255,191,0,0.06)]" />
-        <div className="h-[150px] animate-pulse rounded-2xl bg-[rgba(255,191,0,0.04)]" />
+        <div className="h-[200px] animate-pulse rounded-2xl bg-[var(--color-accent-soft)]" />
+        <div className="h-[150px] animate-pulse rounded-2xl bg-[var(--color-surface-2)]" />
       </div>
-    );
+        </div>
+      </RevealOnScroll>
+        );
   }
 
   // ── Error / not found ───────────────────────────────────────────────────
   if (error || !ticket) {
     return (
+      <RevealOnScroll>
+        <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
       <div className="space-y-6">
         <Link
           href="/tickets"
-          className="inline-flex items-center gap-1 text-sm text-[#FFBF00]/60 transition-colors hover:text-[#FFBF00]"
+          className="inline-flex items-center gap-1 text-sm text-[var(--color-accent)]/60 transition-colors hover:text-[var(--color-accent)]"
         >
           <svg
             className="h-4 w-4"
@@ -193,32 +200,36 @@ export default function TicketDetailPage() {
           </svg>
           Kembali ke Support
         </Link>
-        <div className="rounded-2xl border border-error-500/20 bg-error-500/5 p-8 backdrop-blur-[24px] text-center">
-          <h2 className="text-lg font-semibold text-[#F5F5F0]">
+        <div className="rounded-2xl border border-[var(--color-error)]/20 bg-[var(--color-error)]/[0.05] p-8 backdrop-blur-[24px] text-center">
+          <h2 className="text-lg font-semibold text-[var(--color-fg)]">
             {error ?? "Gagal memuat detail tiket."}
           </h2>
         </div>
       </div>
-    );
+        </div>
+      </RevealOnScroll>
+        );
   }
 
   const status = statusConfig[ticket.status] ?? {
     label: ticket.status,
-    style: "bg-neutral-500/10 text-neutral-400 border-neutral-500/20",
+    style: "bg-[var(--color-surface-3)] text-[var(--color-fg-dim)] border-[var(--color-line)]",
   };
   const priority = priorityConfig[ticket.priority] ?? {
     label: ticket.priority,
-    style: "bg-neutral-500/10 text-neutral-400 border-neutral-500/20",
+    style: "bg-[var(--color-surface-3)] text-[var(--color-fg-dim)] border-[var(--color-line)]",
   };
 
   const canReply = !["closed", "resolved"].includes(ticket.status);
 
   return (
+    <RevealOnScroll>
+      <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
     <div className="space-y-6">
       {/* Back link */}
       <Link
         href="/tickets"
-        className="inline-flex items-center gap-1 text-sm text-[#FFBF00]/60 transition-colors hover:text-[#FFBF00]"
+        className="inline-flex items-center gap-1 text-sm text-[var(--color-accent)]/60 transition-colors hover:text-[var(--color-accent)]"
       >
         <svg
           className="h-4 w-4"
@@ -240,7 +251,7 @@ export default function TicketDetailPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-[#F5F5F0]">
+            <h1 className="text-[32px] font-bold leading-none tracking-tight text-[var(--color-fg)]">
               {ticket.subject}
             </h1>
             <span
@@ -254,15 +265,15 @@ export default function TicketDetailPage() {
               {priority.label}
             </span>
           </div>
-          <p className="mt-1 text-sm text-[#F5F5F0]/40">
+          <p className="mt-1 text-sm text-[var(--color-fg-dim)]">
             Dibuat pada {formatDate(ticket.created_at)}
           </p>
         </div>
       </div>
 
       {/* ─── Message Thread ──────────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-6 backdrop-blur-[24px]">
-        <h2 className="mb-6 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/60">
+      <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 backdrop-blur-[24px]">
+        <h2 className="mb-6 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/60">
           Pesan ({messages.length})
         </h2>
 
@@ -278,25 +289,25 @@ export default function TicketDetailPage() {
                 <div
                   className={`max-w-[80%] rounded-2xl px-5 py-3.5 ${
                     isAdmin
-                      ? "border border-[rgba(255,191,0,0.12)] bg-[rgba(25,20,0,0.6)]"
-                      : "bg-[#FFBF00]/10 border border-[#FFBF00]/20"
+                      ? "border border-[var(--color-line)] bg-[var(--color-surface-2)]"
+                      : "bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20"
                   }`}
                 >
                   <div className="mb-1 flex items-center gap-2">
                     <span
                       className={`text-[10px] font-medium uppercase tracking-wider ${
                         isAdmin
-                          ? "text-[#FFBF00]/60"
-                          : "text-[#FFBF00]/80"
+                          ? "text-[var(--color-accent)]/60"
+                          : "text-[var(--color-accent)]/80"
                       }`}
                     >
                       {isAdmin ? "Admin" : "Anda"}
                     </span>
-                    <span className="text-[10px] text-[#F5F5F0]/30">
+                    <span className="text-[10px] text-[var(--color-fg-dim)]">
                       {formatDate(msg.created_at)}
                     </span>
                   </div>
-                  <p className="whitespace-pre-wrap text-sm text-[#F5F5F0]/80">
+                  <p className="whitespace-pre-wrap text-sm text-[var(--color-fg)]">
                     {msg.message}
                   </p>
                 </div>
@@ -308,8 +319,8 @@ export default function TicketDetailPage() {
 
       {/* ─── Reply Form ──────────────────────────────────────────────────── */}
       {canReply && (
-        <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-6 backdrop-blur-[24px]">
-          <h2 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[#FFBF00]/60">
+        <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 backdrop-blur-[24px]">
+          <h2 className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--color-accent)]/60">
             Balas Tiket
           </h2>
           <div className="space-y-4">
@@ -318,14 +329,14 @@ export default function TicketDetailPage() {
               placeholder="Tulis balasan Anda..."
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
-              className="block w-full rounded-xl border border-[rgba(255,191,0,0.1)] bg-[rgba(25,20,0,0.4)] px-4 py-3 text-sm text-[#F5F5F0] placeholder-[#F5F5F0]/30 transition-colors focus:border-[rgba(255,191,0,0.3)] focus:outline-none focus:ring-1 focus:ring-[#FFBF00]/20"
+              className="block w-full rounded-xl border border-[var(--color-accent-soft)] bg-[var(--color-surface-2)] px-4 py-3 text-sm text-[var(--color-fg)] placeholder-[var(--color-fg)]/30 transition-colors focus:border-[var(--color-accent)]/30 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]/20"
             />
             <div className="flex justify-end">
               <button
                 type="button"
                 onClick={handleReply}
                 disabled={replying || !replyText.trim()}
-                className="inline-flex items-center rounded-full bg-[#FFBF00] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] shadow-[0_0_20px_rgba(255,191,0,0.25)] transition-all hover:shadow-[0_0_30px_rgba(255,191,0,0.4)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center rounded-full bg-[var(--color-accent)] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] shadow-[0_0_20px_var(--color-accent-soft)] transition-all hover:shadow-[0_0_30px_rgba(198,242,74,0.4)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {replying ? (
                   <>
@@ -342,13 +353,15 @@ export default function TicketDetailPage() {
       )}
 
       {!canReply && (
-        <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-6 backdrop-blur-[24px] text-center">
-          <p className="text-sm text-[#F5F5F0]/40">
+        <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 backdrop-blur-[24px] text-center">
+          <p className="text-sm text-[var(--color-fg-dim)]">
             Tiket ini sudah {ticket.status === "resolved" ? "terselesaikan" : "ditutup"}.
             Buat tiket baru jika membutuhkan bantuan tambahan.
           </p>
         </div>
       )}
     </div>
-  );
+      </div>
+    </RevealOnScroll>
+    );
 }

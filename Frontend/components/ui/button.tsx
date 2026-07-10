@@ -6,22 +6,22 @@ import { cn } from "@/lib/utils";
 
 const buttonVariants = {
   primary:
-    "bg-gradient-to-r from-amber-brand to-amber-brand-dark text-[#0D0B00] font-bold hover:brightness-110 focus-visible:ring-amber-brand shadow-glow",
+    "bg-[var(--color-accent)] text-[var(--color-accent-fg)] font-semibold hover:brightness-110 focus-visible:ring-[var(--color-accent)]",
   secondary:
-    "bg-surface-glass text-foreground backdrop-blur-xl border border-surface-glass-border hover:border-amber-glow focus-visible:ring-amber-brand",
+    "bg-[var(--color-surface-3)] text-[var(--color-fg)] border border-[var(--color-line)] hover:border-[var(--color-line-strong)] focus-visible:ring-[var(--color-line-strong)]",
   outline:
-    "border border-amber-brand/30 bg-transparent text-amber-brand hover:bg-amber-brand/10 focus-visible:ring-amber-brand",
+    "border border-[var(--color-accent)]/30 bg-transparent text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 focus-visible:ring-[var(--color-accent)]",
   ghost:
-    "text-foreground/70 hover:bg-foreground/5 hover:text-foreground focus-visible:ring-foreground-muted",
+    "text-[var(--color-fg-muted)] hover:bg-white/[0.04] hover:text-[var(--color-fg)] focus-visible:ring-[var(--color-line-strong)]",
   danger:
-    "bg-error-600 text-white hover:bg-error-700 focus-visible:ring-error-500",
-};
+    "bg-[var(--color-error)] text-[#1c0a0a] font-semibold hover:brightness-110 focus-visible:ring-[var(--color-error)]",
+} as const;
 
 const buttonSizes = {
   sm: "h-8 px-3 text-xs rounded-md",
   md: "h-10 px-4 text-sm rounded-lg",
   lg: "h-12 px-6 text-base rounded-xl",
-};
+} as const;
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: keyof typeof buttonVariants;
@@ -37,6 +37,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       size = "md",
       loading = false,
       disabled,
+      type = "button",
       children,
       ...props
     },
@@ -45,8 +46,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         ref={ref}
+        type={type}
         className={cn(
-          "inline-flex items-center justify-center gap-2 font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0D0B00] disabled:pointer-events-none disabled:opacity-50",
+          "inline-flex items-center justify-center gap-2 font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg)] disabled:pointer-events-none disabled:opacity-50",
           buttonVariants[variant],
           buttonSizes[size],
           className,

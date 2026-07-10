@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api, ApiException } from "@/lib/api";
 import { formatPrice } from "@/lib/formatters";
+import { RevealOnScroll } from "@/components/landing/reveal-on-scroll";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -53,27 +54,27 @@ const statusConfig: Record<
   pending_payment: {
     label: "Menunggu Pembayaran",
     style:
-      "bg-amber-500/10 text-amber-400 border-amber-500/20",
+      "bg-[var(--color-amber)]/10 text-[var(--color-amber)] border-[var(--color-amber)]/20",
   },
   paid: {
     label: "Dibayar",
-    style: "bg-success-500/10 text-success-400 border-success-500/20",
+    style: "bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]/20",
   },
   processing: {
     label: "Diproses",
-    style: "bg-info-500/10 text-info-400 border-info-500/20",
+    style: "bg-[var(--color-steel)]/10 text-[var(--color-steel)] border-[var(--color-steel)]/20",
   },
   completed: {
     label: "Selesai",
-    style: "bg-success-500/10 text-success-400 border-success-500/20",
+    style: "bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]/20",
   },
   cancelled: {
     label: "Dibatalkan",
-    style: "bg-error-500/10 text-error-400 border-error-500/20",
+    style: "bg-[var(--color-error)]/10 text-[var(--color-error)] border-[var(--color-error)]/20",
   },
   expired: {
     label: "Kadaluarsa",
-    style: "bg-neutral-500/10 text-neutral-400 border-neutral-500/20",
+    style: "bg-[var(--color-surface-3)] text-[var(--color-fg-dim)] border-[var(--color-line)]",
   },
 };
 
@@ -124,65 +125,75 @@ export default function OrdersPage() {
   // ── Loading skeleton ────────────────────────────────────────────────────
   if (loading) {
     return (
+      <RevealOnScroll>
+        <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
       <div className="space-y-6">
         <div>
-          <div className="h-8 w-48 animate-pulse rounded bg-[rgba(255,191,0,0.08)]" />
-          <div className="mt-2 h-4 w-72 animate-pulse rounded bg-[rgba(255,191,0,0.05)]" />
+          <div className="h-8 w-48 animate-pulse rounded bg-[var(--color-accent-soft)]" />
+          <div className="mt-2 h-4 w-72 animate-pulse rounded bg-[var(--color-surface-2)]" />
         </div>
 
         {/* Table skeleton */}
-        <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-6 backdrop-blur-[24px]">
+        <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 backdrop-blur-[24px]">
           <div className="space-y-4">
             {Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
-                className="h-14 animate-pulse rounded-lg bg-[rgba(255,191,0,0.04)]"
+                className="h-14 animate-pulse rounded-lg bg-[var(--color-surface-2)]"
               />
             ))}
           </div>
         </div>
       </div>
-    );
+        </div>
+      </RevealOnScroll>
+        );
   }
 
   // ── Error ───────────────────────────────────────────────────────────────
   if (error) {
     return (
+      <RevealOnScroll>
+        <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-[#F5F5F0]">Orders</h1>
+          <h1 className="text-[32px] font-bold leading-none tracking-tight text-[var(--color-fg)]">Orders</h1>
         </div>
-        <div className="rounded-2xl border border-error-500/20 bg-error-500/5 p-8 backdrop-blur-[24px] text-center">
-          <p className="text-sm text-error-400">{error}</p>
+        <div className="rounded-2xl border border-[var(--color-error)]/20 bg-[var(--color-error)]/[0.05] p-8 backdrop-blur-[24px] text-center">
+          <p className="text-sm text-[var(--color-error)]">{error}</p>
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="mt-4 rounded-full border border-[rgba(255,191,0,0.12)] bg-[rgba(25,20,0,0.6)] px-6 py-2.5 text-sm font-medium text-[#F5F5F0]/60 transition-colors hover:border-[rgba(255,191,0,0.3)] hover:text-[#F5F5F0]"
+            className="mt-4 rounded-full border border-[var(--color-line)] bg-[var(--color-surface-2)] px-6 py-2.5 text-sm font-medium text-[var(--color-fg-muted)] transition-colors hover:border-[var(--color-accent)]/30 hover:text-[var(--color-fg)]"
           >
             Coba Lagi
           </button>
         </div>
       </div>
-    );
+        </div>
+      </RevealOnScroll>
+        );
   }
 
   // ── Main render ─────────────────────────────────────────────────────────
   return (
+    <RevealOnScroll>
+      <div className="mx-auto w-full max-w-[1040px] px-6 py-10">
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-[#F5F5F0]">Orders</h1>
-        <p className="mt-1 text-sm text-[#F5F5F0]/50">
+        <h1 className="text-[32px] font-bold leading-none tracking-tight text-[var(--color-fg)]">Orders</h1>
+        <p className="mt-2 text-sm text-[var(--color-fg-muted)]">
           Kelola dan pantau semua pesanan Anda.
         </p>
       </div>
 
       {/* Empty state */}
       {orders.length === 0 && (
-        <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-12 backdrop-blur-[24px] text-center">
-          <div className="flex h-16 w-16 mx-auto items-center justify-center rounded-full bg-[rgba(255,191,0,0.06)]">
+        <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-12 backdrop-blur-[24px] text-center">
+          <div className="flex h-16 w-16 mx-auto items-center justify-center rounded-full bg-[var(--color-accent-soft)]">
             <svg
-              className="h-8 w-8 text-[#FFBF00]/40"
+              className="h-8 w-8 text-[var(--color-accent)]/40"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -195,15 +206,15 @@ export default function OrdersPage() {
               />
             </svg>
           </div>
-          <h3 className="mt-4 text-lg font-semibold text-[#F5F5F0]">
+          <h3 className="mt-4 text-lg font-semibold text-[var(--color-fg)]">
             Belum Ada Order
           </h3>
-          <p className="mt-2 text-sm text-[#F5F5F0]/40">
+          <p className="mt-2 text-sm text-[var(--color-fg-dim)]">
             Setelah Anda melakukan pemesanan, order akan tampil di sini.
           </p>
           <Link
             href="/marketplace"
-            className="mt-6 inline-flex items-center rounded-full bg-[#FFBF00] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] shadow-[0_0_20px_rgba(255,191,0,0.25)]"
+            className="mt-6 inline-flex items-center rounded-full bg-[var(--color-accent)] px-6 py-2.5 text-sm font-semibold text-[#0D0B00] shadow-[0_0_20px_var(--color-accent-soft)]"
           >
             Jelajahi Marketplace
           </Link>
@@ -217,7 +228,7 @@ export default function OrdersPage() {
             const status = statusConfig[order.status] ?? {
               label: order.status,
               style:
-                "bg-neutral-500/10 text-neutral-400 border-neutral-500/20",
+                "bg-[var(--color-surface-3)] text-[var(--color-fg-dim)] border-[var(--color-line)]",
             };
             const primaryItem = order.items?.[0];
 
@@ -227,12 +238,12 @@ export default function OrdersPage() {
                 href={`/orders/${order.public_id}`}
                 className="group block"
               >
-                <div className="rounded-2xl border border-[rgba(255,191,0,0.08)] bg-[rgba(25,20,0,0.4)] p-6 backdrop-blur-[24px] transition-colors hover:border-[rgba(255,191,0,0.18)]">
+                <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 backdrop-blur-[24px] transition-colors hover:border-[var(--color-accent-soft)]">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     {/* Left: order info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3">
-                        <span className="font-mono text-xs text-[#F5F5F0]/40">
+                        <span className="font-mono text-xs text-[var(--color-fg-dim)]">
                           {order.order_number ?? order.public_id}
                         </span>
                         <span
@@ -242,11 +253,11 @@ export default function OrdersPage() {
                         </span>
                       </div>
 
-                      <h3 className="mt-2 text-sm font-semibold text-[#F5F5F0] truncate">
+                      <h3 className="mt-2 text-sm font-semibold text-[var(--color-fg)] truncate">
                         {primaryItem?.product_name ?? "Order"}
                       </h3>
 
-                      <div className="mt-1 flex items-center gap-3 text-xs text-[#F5F5F0]/40">
+                      <div className="mt-1 flex items-center gap-3 text-xs text-[var(--color-fg-dim)]">
                         <span>{formatDate(order.created_at)}</span>
                         {primaryItem?.billing_cycle && (
                           <>
@@ -261,11 +272,11 @@ export default function OrdersPage() {
 
                     {/* Right: total + arrow */}
                     <div className="flex items-center gap-4">
-                      <span className="text-lg font-bold text-[#FFBF00]">
+                      <span className="text-lg font-bold text-[var(--color-accent)]">
                         {formatPrice(order.total, order.currency)}
                       </span>
                       <svg
-                        className="h-4 w-4 text-[#F5F5F0]/20 transition-transform group-hover:translate-x-1 group-hover:text-[#FFBF00]/60"
+                        className="h-4 w-4 text-[var(--color-fg)]/20 transition-transform group-hover:translate-x-1 group-hover:text-[var(--color-accent)]/60"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -286,5 +297,7 @@ export default function OrdersPage() {
         </div>
       )}
     </div>
-  );
+      </div>
+    </RevealOnScroll>
+    );
 }
