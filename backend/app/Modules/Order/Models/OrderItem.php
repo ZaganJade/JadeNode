@@ -2,8 +2,8 @@
 
 namespace App\Modules\Order\Models;
 
-use App\Models\ProviderProfile;
 use App\Modules\Marketplace\Models\ResourceProduct;
+use App\Modules\Provider\Models\Provider;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -59,6 +59,6 @@ class OrderItem extends Model
 
     public function provider(): BelongsTo
     {
-        return $this->belongsTo(ProviderProfile::class, 'provider_id');
+        return $this->belongsTo(Provider::class, 'provider_id');
     }
 }

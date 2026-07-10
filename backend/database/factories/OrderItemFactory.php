@@ -22,7 +22,14 @@ class OrderItemFactory extends Factory
             'product_snapshot' => [
                 'name' => 'VPS Starter',
                 'slug' => 'vps-starter',
-                'specs' => '2 vCPU, 4GB RAM, 80GB SSD',
+                'specs' => [
+                    'cpu_cores' => 2,
+                    'ram_gb' => 4,
+                    'storage_gb' => 80,
+                    'storage_type' => 'SSD',
+                    'bandwidth_tb' => 2,
+                    'ipv4' => 1,
+                ],
                 'region' => 'Jakarta',
                 'resource_type' => 'vps',
             ],

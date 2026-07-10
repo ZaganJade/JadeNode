@@ -42,7 +42,7 @@ class InvoiceController
         }
 
         return response()->json([
-            'invoice' => new \App\Http\Resources\InvoiceResource($invoice),
+            'invoice' => new \App\Http\Resources\InvoiceDetailResource($invoice),
         ]);
     }
 

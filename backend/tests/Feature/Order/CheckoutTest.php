@@ -115,12 +115,11 @@ class CheckoutTest extends TestCase
         $response->assertJsonStructure([
             'message',
             'order' => [
-                'id',
                 'public_id',
                 'order_number',
                 'status',
                 'billing_cycle',
-                'subtotal_minor',
+                'total',
                 'currency',
                 'items',
                 'invoices',
@@ -129,7 +128,7 @@ class CheckoutTest extends TestCase
         ]);
         $response->assertJsonPath('order.status', 'pending_payment');
         $response->assertJsonPath('order.billing_cycle', 'monthly');
-        $response->assertJsonPath('order.subtotal_minor', 5000000);
+        $response->assertJsonPath('order.total', 5000000);
 
         $this->assertDatabaseHas('orders', [
             'user_id' => $user->id,
@@ -231,7 +230,7 @@ class CheckoutTest extends TestCase
         ]);
 
         $firstResponse->assertStatus(201);
-        $firstOrderId = $firstResponse->json('order.id');
+        $firstOrderId = $firstResponse->json('order.public_id');
         $firstOrderNumber = $firstResponse->json('order.order_number');
 
         // Second request with same idempotency key
@@ -242,7 +241,7 @@ class CheckoutTest extends TestCase
         ]);
 
         $secondResponse->assertStatus(200);
-        $secondResponse->assertJsonPath('order.id', $firstOrderId);
+        $secondResponse->assertJsonPath('order.public_id', $firstOrderId);
         $secondResponse->assertJsonPath('order.order_number', $firstOrderNumber);
 
         // Only one order should exist
@@ -265,11 +264,10 @@ class CheckoutTest extends TestCase
         $this->assertCount(1, $items);
 
         $item = $items[0];
-        $this->assertEquals('VPS Starter', $item['product_snapshot']['name']);
-        $this->assertEquals('vps-starter', $item['product_snapshot']['slug']);
-        $this->assertEquals('Jakarta', $item['product_snapshot']['region']);
-        $this->assertEquals('vps', $item['product_snapshot']['resource_type']);
-        $this->assertArrayHasKey('specs', $item['product_snapshot']);
+        $this->assertEquals('VPS Starter', $item['product_name']);
+        $this->assertEquals('Jakarta', $item['region']);
+        $this->assertEquals('vps', $item['resource_type']);
+        $this->assertIsArray($item['specs']);
     }
 
     public function test_user_can_view_own_order(): void
@@ -283,19 +281,19 @@ class CheckoutTest extends TestCase
         ]);
 
         $createResponse->assertStatus(201);
-        $orderId = $createResponse->json('order.id');
+        $orderPublicId = $createResponse->json('order.public_id');
 
-        $showResponse = $this->actingAs($user)->getJson("/api/v1/orders/{$orderId}");
+        $showResponse = $this->actingAs($user)->getJson("/api/v1/orders/{$orderPublicId}");
 
         $showResponse->assertStatus(200);
         $showResponse->assertJsonStructure([
             'order' => [
-                'id',
                 'public_id',
                 'order_number',
                 'status',
+                'total',
                 'items',
-                'invoices',
+                'invoice',
             ],
         ]);
     }
@@ -312,10 +310,10 @@ class CheckoutTest extends TestCase
         ]);
 
         $createResponse->assertStatus(201);
-        $orderId = $createResponse->json('order.id');
+        $orderPublicId = $createResponse->json('order.public_id');
 
         // user2 tries to view user1's order
-        $showResponse = $this->actingAs($user2)->getJson("/api/v1/orders/{$orderId}");
+        $showResponse = $this->actingAs($user2)->getJson("/api/v1/orders/{$orderPublicId}");
 
         $showResponse->assertStatus(404);
     }

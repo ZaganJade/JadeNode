@@ -166,7 +166,7 @@ class CheckoutController
     {
         $order = Order::where('public_id', $id)
             ->where('user_id', $request->user()->id)
-            ->with(['items', 'invoices.payments'])
+            ->with(['items.provider', 'invoices.payments'])
             ->first();
 
         if (! $order) {
@@ -186,7 +186,7 @@ class CheckoutController
     public function index(Request $request): AnonymousResourceCollection
     {
         $orders = Order::where('user_id', $request->user()->id)
-            ->with(['items', 'invoices'])
+            ->with(['items.provider', 'invoices'])
             ->latest()
             ->paginate(15);
 
