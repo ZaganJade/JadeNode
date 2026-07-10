@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_DIR="${APP_DIR:-/mnt/disk2/projects/JadeNode}"
+APP_DIR="${APP_DIR:-/mnt/disk2/Project/JadeNode}"
 COMPOSE_FILE="$APP_DIR/infra/docker/docker-compose.prod.yml"
 ENV_FILE="$APP_DIR/infra/docker/.env.production"
 MAX_LOAD_1M="${MAX_LOAD_1M:-4.0}"

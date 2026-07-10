@@ -13,7 +13,7 @@ services:
     environment:
       RUN_MIGRATIONS: "true"
     volumes:
-      - /mnt/disk2/projects/JadeNode/storage/backend:/app/storage
+      - /mnt/disk2/Project/JadeNode/storage/backend:/app/storage
     networks:
       - jadenode-net
       - global-db-net
